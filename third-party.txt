@@ -1,0 +1,8 @@
+The third party software included and used by this project is:
+
+Software Name: Lighthouse
+Location: /src/performance/helpers/lh
+License: Apache 2.0
+License Location: /src/performance/helpers/lh/LICENSE
+Modified by DDG: No
+Obtained from: https://github.com/GoogleChrome/lighthouse

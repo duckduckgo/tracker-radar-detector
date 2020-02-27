@@ -1,0 +1,5 @@
+.DS_Store
+node_modules
+src/performance/node_modules
+src/entities/node_modules
+src/tds/data/common_requests.json

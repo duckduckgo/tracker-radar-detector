@@ -1,0 +1,45 @@
+{
+  "name": "",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "dependencies": {
+    "async": "2.6.1",
+    "chalk": "^2.4.1",
+    "commander": "^2.19.0",
+    "csv-parse": "^4.4.3",
+    "fs-extra": "^8.0.1",
+    "glob": "^7.1.4",
+    "mathjs": "5.10.0",
+    "progress": "^2.0.3",
+    "randexp": "^0.5.3",
+    "tldjs": "^2.3.1",
+    "tldts": "^3.0.2",
+    "underscore": "^1.9.1",
+    "d3-array": "^2.0.3",
+    "lodash.isequal": "^4.5.0",
+    "parse-cache-control": "^1.0.1",
+    "child_process": "^1.0.2",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  },
+  "scripts": {
+    "build": "./src/trackers/process-crawl.js && ./src/trackers/build-trackers.js",
+    "process-crawl": "./src/trackers/process-crawl.js",
+    "build-trackers": "./src/trackers/build-trackers.js",
+    "build-performance": "./src/performance/group_data.js && ./src/performance/create_stats.js",
+    "update-entities": "./src/entities/update-entities.js",
+    "apply-entity-changes": "./src/entities/apply-entity-changes.js",
+    "test": "npm run lint",
+    "lint": "eslint src/performance/*.js src/performance/helpers/*.js src/trackers/*.js src/trackers/classes/*.js",
+    "lint-fix": "npm run lint -- --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@dub.duckduckgo.com:jason/tracker-lists.git"
+  },
+  "author": "DuckDuckGo",
+  "license": "Apache 2.0"
+}
