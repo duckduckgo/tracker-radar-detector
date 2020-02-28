@@ -8,7 +8,7 @@ To generate a Tracker Radar data set follow these steps:
 
 1. Clone the [Tracker Radar](https://github.com/duckduckgo/tracker-radar) data repo
 
-2. Generate 3rd party request data using the [tracker collector](https://github.com/duckduckgo.com/tracker-radar-collector)
+2. Generate 3rd party request data using the [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector)
 
 3. Update the paths in [config.json](/config.json) to point to your newly created crawler data files and the location of your Tracker Radar data repository
 
