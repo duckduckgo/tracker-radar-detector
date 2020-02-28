@@ -1,6 +1,6 @@
 # DuckDuckGo Tracker Radar Detector
 
-This is the code used but a [Tracker Radar](https://github.com/duckduckgo/tracker-radar) data set using crawl data from the [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector).
+This is the code used to build a [Tracker Radar](https://github.com/duckduckgo/tracker-radar) data set using crawl data from the [Tracker Radar Collector](https://github.com/duckduckgo/tracker-radar-collector).
 
 ## Getting Started
 
