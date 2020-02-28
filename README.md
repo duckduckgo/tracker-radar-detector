@@ -52,7 +52,7 @@ Right now all new feature development is handled internally.
 ### Bug fixes
 
 Most bug fixes are handled internally, but we will accept pull requests for bug fixes if you first:
-1. Create an issue describing the bug. See [Reporting bugs](CONTRIBUTING.md#reporting-bugs)
+1. Create an issue describing the bug.
 2. Get approval from DDG staff before working on it. Since most bug fixes and feature development are handled internally, we want to make sure that your work doesn't conflict with any current projects
 
 ## Questions or help with anything else DuckDuckGo related?
