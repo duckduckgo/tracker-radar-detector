@@ -42,8 +42,8 @@ npm run apply-entity-changes
 
 ### Reporting bugs
 
-1. Check to see if the bug has not already been [reported](https://github.com/duckduckgo/######issues)
-2. Create a bug report [issue](https://github.com/duckduckgo/######issues/new?template=bug_report.md)
+1. Check to see if the bug has not already been [reported](https://github.com/duckduckgo/tracker-radar-detector/issues)
+2. Create a bug report [issue](https://github.com/duckduckgo/tracker-radar-detector/issues/new?template=bug_report.md)
 
 ### New features
 
