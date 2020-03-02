@@ -1,8 +1,8 @@
 {
     "minSites": 2,
-    "trackerDataLoc": "/tmp2/ddg/tracker-radar",
-    "crawlerDataLoc": "/mnt/efs/crawler-data/2020-01-13/3p-crawl",
-    "performanceDataLoc": "/mnt/efs/crawler-data/2020-01-13/performance",
+    "trackerDataLoc": "path to your Tracker Radar repo",
+    "crawlerDataLoc": "path to your 3rd party request directory",
+    "performanceDataLoc": "path to your 3rd party performance directory",
     "flags": {
         "addSurrogates": false
     }
