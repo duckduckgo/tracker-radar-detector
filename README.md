@@ -56,7 +56,7 @@ Most bug fixes are handled internally, but we will accept pull requests for bug 
 2. Get approval from DDG staff before working on it. Since most bug fixes and feature development are handled internally, we want to make sure that your work doesn't conflict with any current projects
 
 ## Questions or help with anything else DuckDuckGo related?
-See [DuckDuckGo Help Pages](https://duck.co/help).
+See [DuckDuckGo Help Pages](https://help.duckduckgo.com).
 
 
 This software is licensed under the terms of the Apache License, Version 2.0 (see [LICENSE](LICENSE)).
