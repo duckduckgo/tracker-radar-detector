@@ -10,8 +10,8 @@ const config = require('./../../config.json')
 const trackerDir = `${config.trackerDataLoc}/domains/`
 const whoisIgnoreList = require('./data/whoisIgnoreList.json')
 const SSLIgnoreList = require('./data/SSLIgnoreList.json')
-const domainMap = require('./data/domainMap.json')
-const entityMap = require('./data/entityMap.json')
+const domainMap = require(`${config.trackerDataLoc}/build-data/generated/domain_map.json`)
+const entityMap = require(`${config.trackerDataLoc}/build-data/generated/entity_map.json`)
 const shortNames = require('./shortNames.js')
 const whoisRegexArray = whoisIgnoreList.map(regex => new RegExp(regex, 'gi'))
 const SSLRegexArray = SSLIgnoreList.map(regex => new RegExp(regex, 'gi'))
@@ -177,7 +177,7 @@ async function fetchInfoForDomain(domain) {
 }
 
 /**
- * Pick single entity for domain, converge similar entities, write file.
+ * Pick single entity for domain, converge similar entities
  */
 const chooseName = domainObj => {
     let entity = ''
@@ -278,7 +278,7 @@ const sanitizeCsvString = name => {
 }
 
 /**
- * Process data file and update entityMap.json and entityList.json with results.
+ * Check tracker files for updates and write changes to ./data/entityUpdates.csv for review
  */
 async function update(directory) {
     if (!fs.existsSync('./data/entityUpdates.csv')) {
