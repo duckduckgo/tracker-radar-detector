@@ -40,7 +40,7 @@ const applyChanges = () => {
     fs.writeFileSync(`${config.trackerDataLoc}/build-data/generated/entity_map.json`, JSON.stringify(entityMap, null, 4))
     // update domainMap.json
     generateDomainMap(entityMap)
-    // update individual entity files in tracker-data-set
+    // update individual entity files in tracker-radar
     exportEntities(entityMap)
 }
 
