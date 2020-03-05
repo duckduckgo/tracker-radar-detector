@@ -2,7 +2,7 @@ const fs = require('fs-extra')
 const parse = require('csv-parse/lib/sync')
 const config = require('./../../config.json')
 const entityDir = `${config.trackerDataLoc}/entities`
-const entityMap = require('./data/entityMap.json')
+const entityMap = require(`${config.trackerDataLoc}/build-data/generated/entity_map.json`)
 const entityCSV = fs.readFileSync('./data/entityUpdates.csv')
 
 const applyChanges = () => {
@@ -37,10 +37,10 @@ const applyChanges = () => {
         newEntity.properties.sort()
     }
     // update entityMap.json
-    fs.writeFileSync('./data/entityMap.json', JSON.stringify(entityMap, null, 4))
+    fs.writeFileSync(`${config.trackerDataLoc}/build-data/generated/entity_map.json`, JSON.stringify(entityMap, null, 4))
     // update domainMap.json
     generateDomainMap(entityMap)
-    // update individual entity files in tracker-data-set
+    // update individual entity files in tracker-radar
     exportEntities(entityMap)
 }
 
@@ -52,7 +52,7 @@ const generateDomainMap = updatedEntityMap => {
             newDomainMap[d] = {entityName: name, aliases: entity.aliases}
         })
     }
-    fs.writeFileSync('./data/domainMap.json', JSON.stringify(newDomainMap, null, 4))
+    fs.writeFileSync(`${config.trackerDataLoc}/build-data/generated/domain_map.json`, JSON.stringify(newDomainMap, null, 4))
 }
 
 const exportEntities = updatedEntityMap => {

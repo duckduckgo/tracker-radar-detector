@@ -1,4 +1,5 @@
-const entityMap = require('./data/entityMap.json')
+const config = require('./../../config.json')
+const entityMap = require(`${config.trackerDataLoc}/build-data/generated/entity_map.json`)
 const corpList = require('./data/corpWords.json')
 // sort corp words by descending length, so longest substring match
 // takes place first, eg match on gmbh before mbh
