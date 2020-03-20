@@ -62,8 +62,8 @@ const exportEntities = updatedEntityMap => {
         const entityData = updatedEntityMap[entity]
         const shortName = entityData.displayName || ''
         const domains = entityData.properties
-        // remove ! and / from filenames before writing
-        const entityFileName = entity.replace(/\//g,'').replace(/!/g,'')
+        // remove special chars from filenames before writing
+        const entityFileName = entity.replace(/\/|!|"|:|>|<|\/|\\|\||\?|\*/g, '')
         const dataToWrite = {name: entity, displayName: shortName, properties: domains}
         fs.writeFileSync(`${entityDir}/${entityFileName}.json`, JSON.stringify(dataToWrite, null, 4))
     }
