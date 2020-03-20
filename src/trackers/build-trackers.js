@@ -56,7 +56,7 @@ console.log(`Found ${summary.trackers} ${chalk.green("trackers")}`)
 console.log(`Found ${summary.entities.length} ${chalk.green("entities")}`)
 console.log(chalk.green("Done"))
 
-fs.writeFileSync(`${sharedData.config.trackerDataLoc}/build-data/generated/releasestats.txt`, `${summary.trackers} trackers\n${summary.entities.length} entities`)
+fs.writeFileSync(`${sharedData.config.trackerDataLoc}/build-data/generated/releasestats.txt`, `${summary.trackers} domains\n${summary.entities.length} entities`)
 
 function log (msg) {
     if (sharedData.config.verbose) {

@@ -22,7 +22,7 @@ function processSite(siteName) {
     const siteData = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/${siteName}`, 'utf8'))
 
     // check that the crawl for this site finished and has data to process
-    if (!siteData.initialUrl || siteData.timeout || !(siteData.data.requests && siteData.data.requests.length)) {
+    if (!siteData.initialUrl || !(siteData.data.requests && siteData.data.requests.length)) {
         crawl.stats.requestsSkipped += 1
         bar.tick()
         return
