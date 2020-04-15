@@ -10,6 +10,7 @@ class Site {
         this.host = url.hostname
         this.domain = url.domain
         this.subdomain = url.subdomain
+        this.searchParams = url.searchParams;
 
         // unique 3p domains on this site with overall fingerprint score for each
         this.uniqueDomains = {}

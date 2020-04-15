@@ -21,6 +21,7 @@ class URL {
         this.hostname = tldObj.hostname || tldsObj.host
         this.subdomain = tldObj.subdomain || tldsObj.subdomain
         this.path = new urlParse.URL(url).pathname
+        this.searchParams = new urlParse.URL(url).searchParams
     }
 
 }

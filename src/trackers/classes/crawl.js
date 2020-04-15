@@ -25,6 +25,8 @@ class Crawl {
         // summary of 3p requests seen in the crawl
         this.commonRequests = {}
 
+        this.urlParameters = {}
+
     }
     
     writeSummaries () {
@@ -83,6 +85,15 @@ function _processSite (crawl, site) {
             crawl.commonRequests[key].update(request, site)
         }
     })
+
+    // count url search parameters
+    for (param of site.searchParams.keys()) {
+        if (crawl.urlParameters[param]) {
+            crawl.urlParameters[param]++
+        } else {
+            crawl.urlParameters[param] = 1
+        }
+    }
 }
 
 function _getCommonRequestKey (request) {
@@ -151,6 +162,13 @@ function _writeSummaries (crawl) {
 
     csv = csv.sort((a, b) => b[1] - a[1])
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.csv`, csv.reduce((str, row) => {str += `"${row[0]}",${row[1]},${row[2]},${row[3]}\n`; return str}, 'Entity,Total Prevalence,Tracking Prevalence,Non-tracking Prevalence\n'))
+
+    var sortableUrlParameters = [];
+    for (var key in crawl.urlParameters) {
+        sortableUrlParameters.push([key, crawl.urlParameters[key]]);
+    }
+    sortableUrlParameters.sort((a, b) => b[1] - a[1]);
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/urlParameters.json`, JSON.stringify(sortableUrlParameters));
 }
 
 function updateEntityPrevalence (crawl) {
