@@ -87,11 +87,17 @@ function _processSite (crawl, site) {
     })
 
     // count url search parameters
+    var siteParamMap = {}
     for (param of site.searchParams) {
         if (crawl.urlParameters[param]) {
-            crawl.urlParameters[param]++
+            crawl.urlParameters[param].requests++
+            if (!siteParamMap[param]) {
+                crawl.urlParameters[param].sites++
+                siteParamMap[param] = true
+            }
         } else {
-            crawl.urlParameters[param] = 1
+            crawl.urlParameters[param] = { requests: 1, sites: 1 }
+            siteParamMap[param] = true
         }
     }
 }
@@ -165,7 +171,7 @@ function _writeSummaries (crawl) {
 
     var sortableUrlParameters = [];
     for (var key in crawl.urlParameters) {
-        sortableUrlParameters.push([key, crawl.urlParameters[key]]);
+        sortableUrlParameters.push([key, crawl.urlParameters[key].sites, crawl.urlParameters[key].requests]);
     }
     sortableUrlParameters.sort((a, b) => b[1] - a[1]);
     fs.writeFileSync(`${shared.config.trackerDataLoc}/urlParameters.json`, JSON.stringify(sortableUrlParameters));
