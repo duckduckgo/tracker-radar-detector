@@ -87,7 +87,7 @@ function _processSite (crawl, site) {
     })
 
     // count url search parameters
-    for (param of site.searchParams.keys()) {
+    for (param of site.searchParams) {
         if (crawl.urlParameters[param]) {
             crawl.urlParameters[param]++
         } else {

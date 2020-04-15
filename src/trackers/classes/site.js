@@ -10,7 +10,7 @@ class Site {
         this.host = url.hostname
         this.domain = url.domain
         this.subdomain = url.subdomain
-        this.searchParams = url.searchParams;
+        this.searchParams = [];
 
         // unique 3p domains on this site with overall fingerprint score for each
         this.uniqueDomains = {}
@@ -72,6 +72,8 @@ function _processRequest (requestData, site) {
     if (request.setsCookies) {
         site.uniqueDomains[request.domain].setsCookies = true
     }
+
+    site.searchParams.push(...request.searchParams);
 
     site.requests.push(request)
 }

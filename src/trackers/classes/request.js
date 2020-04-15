@@ -9,6 +9,7 @@ class Request {
         this.domain = this.data.domain
         this.host = this.data.hostname
         this.path = this.data.path
+        this.searchParams = this.data.searchParams.keys()
 
         this.owner = _getRequestOwner(this.data.domain)
 
