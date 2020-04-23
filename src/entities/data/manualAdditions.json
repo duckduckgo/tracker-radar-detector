@@ -354,7 +354,9 @@
         {"prev": "ING-DiBa AG", "owner": "ING Group"},
         {"prev": "ING CORPORATE SERVICES Pty Ltd", "owner": "ING Group"},
         {"prev": "INTERVIEW STREET TECHNOLOGIES PRIVATE LIMITED", "owner": "HackerRank"},
-        {"prev": "Interviewstreet", "owner": "HackerRank"}
+        {"prev": "Interviewstreet", "owner": "HackerRank"},
+        {"prev": "LINE Corp.", "owner": "NAVER Corp"},
+        {"prev": "IMDb.com, Inc.", "owner": "Amazon Technologies, Inc."}
     ],
     "displayNames": [
         {"name": "Adscore Technologies DMCC", "displayName": "Adscore"},
