@@ -35,6 +35,16 @@ class Tracker {
         if (sharedData.config.flags.addSurrogates) {
             this.addSurrogates()
         }
+
+        this.types = {}
+    }
+
+    addTypes (type, count) {
+        if (!this.types[type]) {
+            this.types[type] = count
+        } else {
+            this.types[type] += count
+        }
     }
 
     addRule (rule) {
