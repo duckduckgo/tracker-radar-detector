@@ -15,7 +15,11 @@ class Request {
 
         this.headers = reqData.responseHeaders || {}
 
-        this.apis = site.siteData.data.apis.callStats[this.url] || {}
+        if (site.siteData.apis.callStats) {
+            this.apis = site.siteData.data.apis.callStats[this.url] || {}
+        } else {
+            this.apis = site.siteData.data.apis[this.url] || {}
+        }
 
         this.setsCookies = _setsCookies(this)
 
@@ -44,7 +48,7 @@ function _isFirstParty (req, site) {
         return true
     }
     return false
-    
+
 }
 
 function _setsCookies (req) {
@@ -52,7 +56,7 @@ function _setsCookies (req) {
         return true
     }
     return false
-    
+
 }
 
 module.exports = Request

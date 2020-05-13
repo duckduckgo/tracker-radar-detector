@@ -19,7 +19,11 @@ const bar = new Progress('Process crawl [:bar] :percent', {width: 40, total: sit
 // it finds for each request. subdomains, cookies, fingerprint apis used, etc...
 // @param {string, crawler file name}
 function processSite(siteName) {
-    const siteData = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/${siteName}`, 'utf8'))
+    let siteData = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/${siteName}`, 'utf8'))
+
+    if (!siteData.data) {
+        siteData.data = siteData
+    }
 
     // check that the crawl for this site finished and has data to process
     if (!siteData.initialUrl || !(siteData.data.requests && siteData.data.requests.length)) {

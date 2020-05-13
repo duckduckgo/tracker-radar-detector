@@ -1,8 +1,8 @@
 {
     "minSites": 2,
-    "trackerDataLoc": "path to your Tracker Radar repo",
-    "crawlerDataLoc": "path to your 3rd party request directory",
-    "performanceDataLoc": "path to your 3rd party performance directory",
+    "trackerDataLoc": "/home/bslayter/tracker-radar",
+    "crawlerDataLoc": "/mnt/efs/crawler-data/extension-data/2020-05-12/data",
+    "performanceDataLoc": "/home/bslayter/fake-perf",
     "flags": {
         "addSurrogates": false
     }
