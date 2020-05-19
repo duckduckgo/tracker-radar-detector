@@ -89,15 +89,19 @@ function _processSite (crawl, site) {
     // count url search parameters
     var siteParamMap = {}
     for (param of site.searchParams) {
-        if (crawl.urlParameters[param]) {
-            crawl.urlParameters[param].requests++
-            if (!siteParamMap[param]) {
-                crawl.urlParameters[param].sites++
-                siteParamMap[param] = true
+        const paramName = param.param
+        if (crawl.urlParameters[paramName]) {
+            crawl.urlParameters[paramName].requests++
+            if (!crawl.urlParameters[paramName].domains.includes(param.domain)) {
+                crawl.urlParameters[paramName].domains.push(param.domain)
+            }
+            if (!siteParamMap[paramName]) {
+                crawl.urlParameters[paramName].sites++
+                siteParamMap[paramName] = true
             }
         } else {
-            crawl.urlParameters[param] = { requests: 1, sites: 1 }
-            siteParamMap[param] = true
+            crawl.urlParameters[paramName] = { requests: 1, sites: 1, domains: [param.domain] }
+            siteParamMap[paramName] = true
         }
     }
 }
@@ -171,7 +175,7 @@ function _writeSummaries (crawl) {
 
     var sortableUrlParameters = [];
     for (var key in crawl.urlParameters) {
-        sortableUrlParameters.push([key, crawl.urlParameters[key].sites, crawl.urlParameters[key].requests]);
+        sortableUrlParameters.push([key, crawl.urlParameters[key].sites, crawl.urlParameters[key].requests, crawl.urlParameters[key].domains]);
     }
     sortableUrlParameters.sort((a, b) => b[1] - a[1]);
     fs.writeFileSync(`${shared.config.trackerDataLoc}/urlParameters.json`, JSON.stringify(sortableUrlParameters));
