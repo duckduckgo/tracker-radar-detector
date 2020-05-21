@@ -31,13 +31,15 @@ for (let key in newData.requests) {
         log(`${chalk.yellow('Create tracker:')} ${key} ${fileName}`)
         const tracker = new Tracker(newTrackerData, crawledSiteTotal)
         tracker.addRule(rule)
-        
+        tracker.addTypes(newTrackerData.type, newTrackerData.sites)
+
         // add this file so we know we now have an existing entry for this tracker
         trackers[fileName] = tracker
         summary.trackers++
     } else {
         log(`${chalk.blue('update tracker')} ${fileName}`)
         trackers[fileName].addRule(rule)
+        trackers[fileName].addTypes(newTrackerData.type, newTrackerData.sites)
     }
         
     if(!summary.entities.includes(trackers[fileName].owner.name)) {
