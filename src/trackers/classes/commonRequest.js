@@ -4,7 +4,7 @@ class CommonRequest {
         this.rule = _escapeUrl(request)
         this.sites = 1
         this.pages = new Set().add(site.domain)
-        
+
         // apis used. only counting one api call per page
         this.apis = Object.keys(request.apis).reduce((obj, key) => {obj[key] = 1; return obj}, {})
 
@@ -83,8 +83,7 @@ function _finalize (request, totalSites) {
     request.fpStd = Math.sqrt(sumSquare / (request.fpPerSite.length - 1)) || 0
 
     delete request.fpPerSite
-    
-    request.pages = [...request.pages]
+    delete request.pages
     request.subdomains = [...request.subdomains]
 }
 
