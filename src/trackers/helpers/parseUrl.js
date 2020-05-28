@@ -20,7 +20,32 @@ class URL {
 
         this.hostname = tldObj.hostname || tldsObj.host
         this.subdomain = tldObj.subdomain || tldsObj.subdomain
-        this.path = new urlParse.URL(url).pathname
+        const urlData = URL.parse(url)
+
+        this.path = urlData.pathname
+    }
+
+    /*
+     * Format and parse the URL. In cases where the scheme is missing
+     * attempt to guess it.
+     * @param {string} url - url to parse
+     *
+     * @return {urlParse.URL} The parsed URL
+     */
+    static parse(url) {
+        let urlData
+        try {
+            urlData = new urlParse.URL(url)
+        } catch (e) {
+            if (e instanceof TypeError) {
+                urlData = new urlParse.URL("http://" + url)
+            }
+            else {
+                console.log(`error for ${url}`)
+                throw e
+            }
+        }
+        return urlData
     }
 
 }

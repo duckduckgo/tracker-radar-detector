@@ -5,5 +5,7 @@
     "performanceDataLoc": "path to your 3rd party performance directory",
     "flags": {
         "addSurrogates": false
-    }
+    },
+    "keepFirstParty": false,
+    "treatCnameAsFirstParty": false
 }

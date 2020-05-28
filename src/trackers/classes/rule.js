@@ -10,6 +10,7 @@ class Rule {
         this.apis = newRuleData.apis
         this.sites = newRuleData.sites
         this.prevalence = +(newRuleData.sites / totalSites).toPrecision(3)
+        this.cnames = newRuleData.cnames
     }
 }
 

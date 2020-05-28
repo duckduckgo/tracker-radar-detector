@@ -19,6 +19,7 @@ class CommonRequest {
         this.cookies = 0
         this.fpStd = 0
         this.fpAvg = 0
+        this.cnames = []
     }
 
     update (request, site) {
@@ -55,6 +56,13 @@ function _update (commonReq, newReq, site) {
         
         if (newReq.setsCookies) {
             commonReq.cookiesOn++
+        }
+
+        if (newReq.wasCNAME) {
+            commonReq.cnames.push({
+                "original": newReq.originalSubdomain,
+                "cname": newReq.data.subdomain + "." + newReq.data.domain
+            })
         }
     }
 }

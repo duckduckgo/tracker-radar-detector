@@ -14,6 +14,7 @@ class Tracker {
         this.prevalence = +prevalence.toPrecision(3)
         this.sites = Math.round(prevalence * crawledSiteTotal)
         this.subdomains = []
+        this.cnames = []
 
         this.fingerprinting = getFpRank(sharedData.domains[this.domain].fp || 0)
         this.resources = []
@@ -50,6 +51,7 @@ class Tracker {
     addRule (rule) {
         this.resources.push(rule)
         this.subdomains = [...new Set(this.subdomains.concat(rule.subdomains))]
+        this.cnames = [...new Set(this.cnames.concat(rule.cnames))]
     }
 
     addSurrogates () {
