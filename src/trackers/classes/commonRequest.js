@@ -61,7 +61,7 @@ function _update (commonReq, newReq, site) {
         if (newReq.wasCNAME) {
             commonReq.cnames.push({
                 "original": newReq.originalSubdomain,
-                "cname": newReq.data.subdomain + "." + newReq.data.domain
+                "resolved": newReq.data.subdomain + "." + newReq.data.domain
             })
         }
     }

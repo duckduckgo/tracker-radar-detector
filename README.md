@@ -38,6 +38,8 @@ npm run apply-entity-changes
 
 `npm run build`
 
+Note that if you wish to resolve CNAME's, node version 12+ is required.
+
 ## Contributing
 
 ### Reporting bugs
