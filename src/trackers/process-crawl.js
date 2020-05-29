@@ -30,10 +30,13 @@ async function processSite(siteName) {
 
     const site = new Site(siteData)
 
+    let requestProcesses = []
     for (let request of siteData.data.requests) {
-        await site.processRequest(request)
+        requestProcesses.push(site.processRequest(request))
         crawl.stats.requests++
     }
+
+    await Promise.allSettled(requestProcesses);
 
     // update crawl level domain prevalence, entity prevalence, and fingerprinting
     crawl.processSite(site)

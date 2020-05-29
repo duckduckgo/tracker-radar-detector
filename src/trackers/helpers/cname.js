@@ -27,7 +27,7 @@ async function resolveCname(url) {
     } catch (e) {
         if (e.message && !(
             e.message.includes("ENODATA") ||
-            e.message.includes("chrome-extension"))) {
+            e.message.includes("ENOTFOUND"))) {
             console.log(e)
             return undefined
         }
