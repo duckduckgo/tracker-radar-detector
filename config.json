@@ -7,5 +7,6 @@
         "addSurrogates": false
     },
     "keepFirstParty": false,
-    "treatCnameAsFirstParty": false
+    "treatCnameAsFirstParty": false,
+    "parallelism": 100
 }
