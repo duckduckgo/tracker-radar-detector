@@ -19,7 +19,7 @@ class CommonRequest {
         this.cookies = 0
         this.fpStd = 0
         this.fpAvg = 0
-        this.cnames = []
+        this.cnames = request.wasCNAME ? [_cnameRecord(request)] : []
     }
 
     update (request, site) {
@@ -38,6 +38,13 @@ function _escapeUrl (request) {
     }
 
     return rule.replace(/(\(|\)|\/|\?|\.|\||\[)/g,'\\$1')
+}
+
+function _cnameRecord(request) {
+    return {
+        "original": request.originalSubdomain,
+        "resolved": request.data.subdomain + "." + request.data.domain
+    }
 }
 
 function _update (commonReq, newReq, site) {
@@ -59,10 +66,7 @@ function _update (commonReq, newReq, site) {
         }
 
         if (newReq.wasCNAME) {
-            commonReq.cnames.push({
-                "original": newReq.originalSubdomain,
-                "resolved": newReq.data.subdomain + "." + newReq.data.domain
-            })
+            commonReq.cnames.push(_cnameRecord(newReq))
         }
     }
 }
