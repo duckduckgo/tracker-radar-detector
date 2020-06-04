@@ -99,6 +99,20 @@ function _analyzeRequest(request, site) {
 }
 
 /**
+ *  Determine if a request is for a root site, meaning the main site being
+ *  visited. If navigating to login.microsoft.com, that would be only
+ *  login.microsoft.com or whatever it is redirected to (for instance, with a 301)
+ *  @param {Request Object} request - a Request object
+ *  @param {Site} site - the current site object
+ */
+function isRootSite(request, site) {
+    const isInitial = `${request.data.subdomain}.${request.data.domain}` === `${site.subdomain}.${site.domain}`
+    const finalURL = site.siteData.finalUrl ? new ParsedUrl(site.siteData.finalUrl) : ''
+    const isFinal = `${request.data.subdomain}.${request.data.domain}` === `${finalURL.subdomain}.${finalURL.domain}`
+    return isInitial || isFinal
+}
+
+/**
  *  Process a single request, resolve CNAME's (if any)
  *  @param {Object} requestData - The raw request data
  *  @param {Site} site - the current site object
@@ -106,7 +120,11 @@ function _analyzeRequest(request, site) {
 async function _processRequest (requestData, site) {
     let request = new Request(requestData, site)
 
-    if (site.isFirstParty(request.url) && !shared.config.treatCnameAsFirstParty) {
+    // If this request is a subdomain of the site, see if it is cnamed
+    if (site.isFirstParty(request.url) &&
+        !shared.config.treatCnameAsFirstParty &&
+        !isRootSite(request, site)
+        ) {
         let cnames = await resolveCname(request.url)
         if(cnames) {
             for (let cname of cnames) {
