@@ -40,6 +40,15 @@ function _escapeUrl (request) {
     return rule.replace(/(\(|\)|\/|\?|\.|\||\[)/g,'\\$1')
 }
 
+function _containsCnameRecord(commonReq, record) {
+    for (let cReq of commonReq.cnames) {
+        if (cReq.original === record.original && cReq.resolved === record.resolved) {
+            return true
+        }
+    }
+    return false
+}
+
 function _cnameRecord(request) {
     return {
         "original": request.originalSubdomain,
@@ -66,7 +75,10 @@ function _update (commonReq, newReq, site) {
         }
 
         if (newReq.wasCNAME) {
-            commonReq.cnames.push(_cnameRecord(newReq))
+            let record = _cnameRecord(newReq)
+            if (!_containsCnameRecord(commonReq, record)) {
+                commonReq.cnames.push(record)
+            }
         }
     }
 }
