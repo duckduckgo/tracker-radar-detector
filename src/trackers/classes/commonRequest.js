@@ -1,3 +1,5 @@
+const cname = require('./../helpers/cname.js')
+
 class CommonRequest {
     constructor (request, site) {
         this.host = request.domain
@@ -19,7 +21,7 @@ class CommonRequest {
         this.cookies = 0
         this.fpStd = 0
         this.fpAvg = 0
-        this.cnames = request.wasCNAME ? [_cnameRecord(request)] : []
+        this.cnames = request.wasCNAME ? [cname.createCnameRecord(request)] : []
     }
 
     update (request, site) {
@@ -40,21 +42,7 @@ function _escapeUrl (request) {
     return rule.replace(/(\(|\)|\/|\?|\.|\||\[)/g,'\\$1')
 }
 
-function _containsCnameRecord(commonReq, record) {
-    for (let cReq of commonReq.cnames) {
-        if (cReq.original === record.original && cReq.resolved === record.resolved) {
-            return true
-        }
-    }
-    return false
-}
 
-function _cnameRecord(request) {
-    return {
-        "original": request.originalSubdomain,
-        "resolved": request.data.subdomain + "." + request.data.domain
-    }
-}
 
 function _update (commonReq, newReq, site) {
     // update common request with new data only once for each site. If a site has 100s of requests
@@ -75,8 +63,8 @@ function _update (commonReq, newReq, site) {
         }
 
         if (newReq.wasCNAME) {
-            let record = _cnameRecord(newReq)
-            if (!_containsCnameRecord(commonReq, record)) {
+            let record = cname.createCnameRecord(newReq)
+            if (!cname.containsCnameRecord(commonReq.cnames, record)) {
                 commonReq.cnames.push(record)
             }
         }

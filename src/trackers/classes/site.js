@@ -1,7 +1,7 @@
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const ParsedUrl = require('./../helpers/parseUrl.js')
-const resolveCname = require('./../helpers/cname.js')
+const cname = require('./../helpers/cname.js')
 
 class Site {
     constructor (siteData) {
@@ -125,7 +125,7 @@ async function _processRequest (requestData, site) {
         !shared.config.treatCnameAsFirstParty &&
         !isRootSite(request, site)
         ) {
-        let cnames = await resolveCname(request.url)
+        let cnames = await cname.resolveCname(request.url)
         if(cnames) {
             for (let cname of cnames) {
                 if (!site.isFirstParty(cname)) {

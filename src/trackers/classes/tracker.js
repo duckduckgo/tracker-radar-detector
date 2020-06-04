@@ -2,6 +2,7 @@ const tldjs = require('tldjs')
 const performanceHelper = require('./../helpers/getPerformance.js')
 const sharedData = require('./../helpers/sharedData.js')
 const getFpRank = require('./../helpers/getFingerprintRank.js')
+const cname = require('./../helpers/cname.js')
 
 class Tracker {
     constructor(trackerData, crawledSiteTotal) {
@@ -51,7 +52,11 @@ class Tracker {
     addRule (rule) {
         this.resources.push(rule)
         this.subdomains = [...new Set(this.subdomains.concat(rule.subdomains))]
-        this.cnames = [...new Set(this.cnames.concat(rule.cnames))]
+        rule.cnames.forEach(record => {
+            if (cname.containsCnameRecord(this.cnames, record)) {
+                this.cnames.push(record)
+            }
+        })
     }
 
     addSurrogates () {
