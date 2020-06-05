@@ -53,7 +53,7 @@ class Tracker {
         this.resources.push(rule)
         this.subdomains = [...new Set(this.subdomains.concat(rule.subdomains))]
         rule.cnames.forEach(record => {
-            if (cname.containsCnameRecord(this.cnames, record)) {
+            if (!cname.containsCnameRecord(this.cnames, record)) {
                 this.cnames.push(record)
             }
         })
