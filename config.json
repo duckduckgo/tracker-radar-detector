@@ -8,5 +8,7 @@
     },
     "keepFirstParty": false,
     "treatCnameAsFirstParty": false,
-    "parallelism": 100
+    "parallelism": 100,
+    "verbose": false,
+    "cname_ignore_subdomains": ["", "www"]
 }

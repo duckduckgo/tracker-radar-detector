@@ -4,6 +4,7 @@
 
 const dns = require('dns').promises
 const ParsedUrl = require('./parseUrl.js')
+const shared = require('./sharedData.js')
 
 
 const cache = {}
@@ -62,6 +63,24 @@ class CNAME {
             "original": request.originalSubdomain,
             "resolved": request.data.subdomain + "." + request.data.domain
         }
+    }
+
+    /**
+     * Check whether this subdomain should be exluded from cname lookups.
+     * Initially sites like the root domain and www domains, since they 
+     * generally only resolve to CDN's.
+     * @param {ParsedURL} url - a ParsedURL object.
+     * @returns {boolean} true if subdomain is in the ignore list.
+     */
+    static isSubdomainExcluded(url) {
+        if (shared.config.cname_ignore_subdomains) {
+            for (let subdomain of shared.config.cname_ignore_subdomains) {
+                if (url.subdomain === subdomain) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
 

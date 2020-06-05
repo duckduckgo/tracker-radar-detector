@@ -123,7 +123,8 @@ async function _processRequest (requestData, site) {
     // If this request is a subdomain of the site, see if it is cnamed
     if (site.isFirstParty(request.url) &&
         !shared.config.treatCnameAsFirstParty &&
-        !isRootSite(request, site)
+        !isRootSite(request, site) &&
+        !cname.isSubdomainExcluded(request.data)
         ) {
         let cnames = await cname.resolveCname(request.url)
         if(cnames) {
