@@ -57,6 +57,7 @@ class Tracker {
                 this.cnames.push(record)
             }
         })
+        this.cnames.sort((a,b) => a.original.localeCompare(b.original))
     }
 
     addSurrogates () {
