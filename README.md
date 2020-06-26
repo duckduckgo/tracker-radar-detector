@@ -38,6 +38,8 @@ npm run apply-entity-changes
 
 `npm run build`
 
+Note that if you wish to resolve CNAME's, node version 12+ is required. You can disable CNAME resolution by setting the option treatCnameAsFirstParty=true and keepFirstParty=false in the config file.
+
 ## Contributing
 
 ### Reporting bugs
