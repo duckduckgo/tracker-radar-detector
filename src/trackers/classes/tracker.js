@@ -2,6 +2,7 @@ const tldjs = require('tldjs')
 const performanceHelper = require('./../helpers/getPerformance.js')
 const sharedData = require('./../helpers/sharedData.js')
 const getFpRank = require('./../helpers/getFingerprintRank.js')
+const cname = require('./../helpers/cname.js')
 
 class Tracker {
     constructor(trackerData, crawledSiteTotal) {
@@ -14,6 +15,7 @@ class Tracker {
         this.prevalence = +prevalence.toPrecision(3)
         this.sites = Math.round(prevalence * crawledSiteTotal)
         this.subdomains = []
+        this.cnames = []
 
         this.fingerprinting = getFpRank(sharedData.domains[this.domain].fp || 0)
         this.resources = []
@@ -50,6 +52,12 @@ class Tracker {
     addRule (rule) {
         this.resources.push(rule)
         this.subdomains = [...new Set(this.subdomains.concat(rule.subdomains))]
+        rule.cnames.forEach(record => {
+            if (!cname.containsCnameRecord(this.cnames, record)) {
+                this.cnames.push(record)
+            }
+        })
+        this.cnames.sort((a,b) => a.original.localeCompare(b.original))
     }
 
     addSurrogates () {

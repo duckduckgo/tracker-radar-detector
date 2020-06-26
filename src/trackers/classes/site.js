@@ -1,6 +1,7 @@
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const ParsedUrl = require('./../helpers/parseUrl.js')
+const cname = require('./../helpers/cname.js')
 
 class Site {
     constructor (siteData) {
@@ -23,11 +24,18 @@ class Site {
         this.requests = []
 
         this.owner = shared.entityMap.get(this.domain)
+
+        this.isFirstParty = _isFirstParty.bind(this)
+
+        this.cnameCloaks = {}
+
+        this.analyzeRequest = _analyzeRequest.bind(this)
     }
 
-    processRequest (requestData) {
-        _processRequest(requestData, this)
+    async processRequest (requestData) {
+        await _processRequest(requestData, this)
     }
+
 }
 
 // Cookie data from the crawler has the domain and path split
@@ -41,13 +49,26 @@ function _getCookies (siteData) {
     }, [])
 }
 
-function _processRequest (requestData, site) {
-    const request = new Request(requestData, site)
-
-    if (request.isFirstParty && !shared.config.keepFirstParty) {
-        return
+/**
+ * Test if the given URL is in this first party set.
+ * @param {string} url - url to test against.
+ * @returns {bool} True if the url is in this sites first party set.
+ */
+function _isFirstParty(url) {
+    let data = new ParsedUrl(url)
+    let dataOwner = shared.entityMap.get(data.domain)
+    if (data.domain === this.domain || ((dataOwner && this.owner) && dataOwner === this.owner)) {
+        return true
     }
+    return false
+}
 
+/**
+ *  Analyze a site for tracking or fingerprinting behaviors
+ *  @param {Request} request - The request object
+ *  @param {Site} site - the current site object
+ */
+function _analyzeRequest(request, site) {
     if (request.setsCookies || Object.keys(request.apis).length) {
         request.isTracking = true
     }
@@ -72,6 +93,59 @@ function _processRequest (requestData, site) {
         site.uniqueDomains[request.domain].setsCookies = true
     }
 
+    if (request.wasCNAME) {
+        site.uniqueDomains[request.domain].usesCNAMECloaking = true
+    }
+}
+
+/**
+ *  Determine if a request is for a root site, meaning the main site being
+ *  visited. If navigating to login.microsoft.com, that would be only
+ *  login.microsoft.com or whatever it is redirected to (for instance, with a 301)
+ *  @param {Request Object} request - a Request object
+ *  @param {Site} site - the current site object
+ */
+function isRootSite(request, site) {
+    const isInitial = `${request.data.subdomain}.${request.data.domain}` === `${site.subdomain}.${site.domain}`
+    const finalURL = site.siteData.finalUrl ? new ParsedUrl(site.siteData.finalUrl) : ''
+    const isFinal = `${request.data.subdomain}.${request.data.domain}` === `${finalURL.subdomain}.${finalURL.domain}`
+    return isInitial || isFinal
+}
+
+/**
+ *  Process a single request, resolve CNAME's (if any)
+ *  @param {Object} requestData - The raw request data
+ *  @param {Site} site - the current site object
+ */
+async function _processRequest (requestData, site) {
+    let request = new Request(requestData, site)
+
+    // If this request is a subdomain of the site, see if it is cnamed
+    if (site.isFirstParty(request.url) &&
+        !shared.config.treatCnameAsFirstParty &&
+        !isRootSite(request, site) &&
+        !cname.isSubdomainExcluded(request.data)
+        ) {
+        let cnames = await cname.resolveCname(request.url)
+        if(cnames) {
+            for (let cname of cnames) {
+                if (!site.isFirstParty(cname)) {
+                    // console.log(`Third Party CNAME: ${request.data.subdomain}.${request.data.domain} -> ${cname}`)
+                    let origSubDomain = request.data.subdomain + "." + request.data.domain
+                    site.cnameCloaks[cname] = request.data.subdomain + "." + request.data.domain
+                    request.extractURLData(cname)
+                    request.wasCNAME = true
+                    request.originalSubdomain = origSubDomain
+                }
+            }
+        }
+    }
+
+    if (site.isFirstParty(request.url) && !shared.config.keepFirstParty) {
+        return
+    }
+
+    site.analyzeRequest(request, site)
     site.requests.push(request)
 }
 
