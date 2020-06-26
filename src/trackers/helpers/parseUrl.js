@@ -20,9 +20,12 @@ class URL {
 
         this.hostname = tldObj.hostname || tldsObj.host
         this.subdomain = tldObj.subdomain || tldsObj.subdomain
-        const urlData = URL.parse(url)
-
-        this.path = urlData.pathname
+        try {
+          const urlData = URL.parse(url)
+          this.path = urlData.pathname
+        } catch(e) {
+            console.warn(`\nSkipping unparsable url: ${url}`)
+        }
     }
 
     /*
