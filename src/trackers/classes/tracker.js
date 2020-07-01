@@ -10,7 +10,6 @@ class Tracker {
         let entity = _getEntity(this.domain)
         this.owner = {name: entity.name, displayName: entity.displayName || entity.name} || {}
         this.source = ['DuckDuckGo']
-        this.regions = []
         
         const prevalence = _getPrevalence(this.domain)
         this.prevalence = +prevalence.toPrecision(3)
@@ -67,9 +66,7 @@ class Tracker {
     }
 
     addRegion (countryCode) {
-        if (!this.regions.includes(countryCode)) {
-            this.regions.push(countryCode)
-        }
+        this.source = [`DuckDuckGo-${countryCode}`]
     }
 }
 

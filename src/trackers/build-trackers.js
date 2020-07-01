@@ -7,6 +7,7 @@ const Progress = require('progress')
 const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
 const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
 const regionMap = sharedData.config.flags.regionMap || {}
+const countryCode = regionMap[crawlMetadata.config.proxyHost] || 'US'
 const crawledSiteTotal = newData.stats.sites
 const summary = {trackers: 0, entities: []}
 
@@ -28,22 +29,13 @@ for (let key in newData.requests) {
         continue
     }
 
-    let oldRegions = [];
-    if (fs.existsSync(`${sharedData.config.trackerDataLoc}/domains/${fileName}`)) {
-        const oldTracker = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/domains/${fileName}`, 'utf8'))
-        if (oldTracker.regions) {
-            oldRegions = oldTracker.regions
-        }
-    }
-
     // create a new tracker file
     if (!trackers[fileName]) {
         log(`${chalk.yellow('Create tracker:')} ${key} ${fileName}`)
         const tracker = new Tracker(newTrackerData, crawledSiteTotal)
         tracker.addRule(rule)
         tracker.addTypes(newTrackerData.type, newTrackerData.sites)
-        tracker.regions = oldRegions
-        tracker.addRegion(regionMap[crawlMetadata.config.proxyHost] || 'US')
+        tracker.addRegion(countryCode)
 
         // add this file so we know we now have an existing entry for this tracker
         trackers[fileName] = tracker
@@ -61,8 +53,12 @@ for (let key in newData.requests) {
     bar.tick()
 }
 
+if (!fs.existsSync(`${sharedData.config.trackerDataLoc}/domains/${countryCode}`)) {
+    fs.mkdirSync(`${sharedData.config.trackerDataLoc}/domains/${countryCode}`)
+}
+
 for (const [fileName, tracker] of Object.entries(trackers)) {
-    const filePath = `${sharedData.config.trackerDataLoc}/domains/${fileName}`
+    const filePath = `${sharedData.config.trackerDataLoc}/domains/${countryCode}/${fileName}`
     fs.writeFileSync(filePath, JSON.stringify(tracker, null, 4))
 }
 
