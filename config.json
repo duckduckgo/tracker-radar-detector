@@ -4,10 +4,7 @@
     "crawlerDataLoc": "path to your 3rd party request directory",
     "performanceDataLoc": "path to your 3rd party performance directory",
     "flags": {
-        "addSurrogates": false,
-        "regionMap": {
-            
-        }
+        "addSurrogates": false
     },
     "keepFirstParty": false,
     "treatCnameAsFirstParty": false,

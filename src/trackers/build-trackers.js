@@ -6,8 +6,7 @@ const Progress = require('progress')
 
 const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
 const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
-const regionMap = sharedData.config.flags.regionMap || {}
-const countryCode = regionMap[crawlMetadata.config.proxyHost] || 'US'
+const countryCode = crawlMetadata.config.regionCode || 'US'
 const crawledSiteTotal = newData.stats.sites
 const summary = {trackers: 0, entities: []}
 
@@ -66,7 +65,11 @@ console.log(`Found ${summary.trackers} ${chalk.green("trackers")}`)
 console.log(`Found ${summary.entities.length} ${chalk.green("entities")}`)
 console.log(chalk.green("Done"))
 
-fs.writeFileSync(`${sharedData.config.trackerDataLoc}/build-data/generated/releasestats.txt`, `${summary.trackers} domains\n${summary.entities.length} entities`)
+if (!fs.existsSync(`${sharedData.config.trackerDataLoc}/build-data/generated/${countryCode}`)) {
+    fs.mkdirSync(`${sharedData.config.trackerDataLoc}/build-data/generated/${countryCode}`)
+}
+
+fs.writeFileSync(`${sharedData.config.trackerDataLoc}/build-data/generated/${countryCode}/releasestats.txt`, `${summary.trackers} domains\n${summary.entities.length} entities`)
 
 function log (msg) {
     if (sharedData.config.verbose) {
