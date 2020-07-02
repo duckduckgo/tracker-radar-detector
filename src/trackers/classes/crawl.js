@@ -142,14 +142,13 @@ function _getEntitySummaries (crawl) {
 }
 
 function _writeSummaries (crawl) {
-
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/domain_summary.json`, JSON.stringify(_getDomainSummaries(crawl), null, 4))
 
     fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests.json`, JSON.stringify({stats: crawl.stats, requests: crawl.commonRequests}, null, 4))
 
     _getEntitySummaries(crawl)
 
-    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated//entity_prevalence.json`, JSON.stringify(crawl.entityPrevalence, null, 4))
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.json`, JSON.stringify(crawl.entityPrevalence, null, 4))
 
     // write entity prevalence csv
     let csv = []

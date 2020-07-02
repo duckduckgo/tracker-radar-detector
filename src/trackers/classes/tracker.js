@@ -64,6 +64,10 @@ class Tracker {
         const trackerSurrogates = _getSurrogates(this.domain)
         if (trackerSurrogates) {this.surrogates = trackerSurrogates}
     }
+
+    addRegion (countryCode) {
+        this.source = [`DuckDuckGo-${countryCode}`]
+    }
 }
 
 function _getPolicy (domain, owner={}) {
