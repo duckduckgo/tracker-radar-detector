@@ -33,7 +33,7 @@
     "update-entities": "./src/entities/update-entities.js",
     "apply-entity-changes": "./src/entities/apply-entity-changes.js",
     "test": "npm run lint",
-    "lint": "eslint src/performance/*.js src/performance/helpers/*.js src/trackers/*.js src/trackers/classes/*.js",
+    "lint": "eslint src/",
     "lint-fix": "npm run lint -- --fix"
   },
   "repository": {

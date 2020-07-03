@@ -10,7 +10,7 @@ const shared = require('./sharedData.js')
 const cache = {}
 
 class CNAME {
-    /*
+    /**
      * Attempt to look up a CNAME for a given hostname
      * @param {string} url - url to run the check on.
      *
@@ -25,7 +25,7 @@ class CNAME {
             return undefined
         }
         try {
-            let cname = await dns.resolveCname(url.hostname)
+            const cname = await dns.resolveCname(url.hostname)
             cache[url.hostname] = cname
         } catch (e) {
             if (e.message && !(
@@ -45,7 +45,7 @@ class CNAME {
      * @returns {bool} True if record is contained in the list
      */
     static containsCnameRecord(cnameRecords, record) {
-        for (let cReq of cnameRecords) {
+        for (const cReq of cnameRecords) {
             if (cReq.original === record.original && cReq.resolved === record.resolved) {
                 return true
             }
@@ -74,7 +74,7 @@ class CNAME {
      */
     static isSubdomainExcluded(url) {
         if (shared.config.cname_ignore_subdomains) {
-            for (let subdomain of shared.config.cname_ignore_subdomains) {
+            for (const subdomain of shared.config.cname_ignore_subdomains) {
                 if (url.subdomain === subdomain) {
                     return true
                 }

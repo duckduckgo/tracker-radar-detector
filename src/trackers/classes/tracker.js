@@ -7,7 +7,7 @@ const cname = require('./../helpers/cname.js')
 class Tracker {
     constructor(trackerData, crawledSiteTotal) {
         this.domain = trackerData.host
-        let entity = _getEntity(this.domain)
+        const entity = _getEntity(this.domain)
         this.owner = {name: entity.name, displayName: entity.displayName || entity.name} || {}
         this.source = ['DuckDuckGo']
         
@@ -24,7 +24,7 @@ class Tracker {
         this.cookies = +(_getCookies(this.domain).toPrecision(3))
 
 
-        let policy = _getPolicy(this.domain, this.owner)
+        const policy = _getPolicy(this.domain, this.owner)
         
         if (policy) {
             this.owner.privacyPolicy = policy
@@ -100,10 +100,10 @@ function _getCookies (domain) {
 }
 
 function _getSurrogates (domain) {
-    let trackerSurrogates = []
+    const trackerSurrogates = []
 
     if (sharedData.surrogates[domain]) {
-        for (let [req, resource] of sharedData.surrogates[domain]) {
+        for (const [req, resource] of sharedData.surrogates[domain]) {
             trackerSurrogates.push({rule: req, replaceWith: resource})
         }
     }
@@ -116,7 +116,7 @@ function _getSurrogates (domain) {
 // Look up and add request breakage data for this domian
 function _getBreaking (domain) {
     if (sharedData.breaking) {
-        let breaking = []
+        const breaking = []
         for (const [type, data] of Object.entries(sharedData.breaking)) {
             // only look at request type breaking data
             if (type.match('breaking-request')) {

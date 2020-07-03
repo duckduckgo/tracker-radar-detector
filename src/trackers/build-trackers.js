@@ -12,13 +12,13 @@ const summary = {trackers: 0, entities: []}
 
 const Tracker = require(`./classes/tracker.js`)
 const Rule = require(`./classes/rule.js`)
-let trackers = {}
+const trackers = {}
 
 const bar = new Progress('Building trackers [:bar] :percent', {width: 40, total: Object.keys(newData.requests).length})
 
 // Run through all the new trackers in our crawl data. 
 // Either create a new tracker entry or update an existing
-for (let key in newData.requests) {
+for (const key in newData.requests) {
     const newTrackerData = newData.requests[key]
     const fileName = `${newTrackerData.host}.json`
     const rule = new Rule(newTrackerData, newData.stats.sites)

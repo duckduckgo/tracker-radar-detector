@@ -8,7 +8,7 @@ const entityCSV = fs.readFileSync('./data/entityUpdates.csv')
 const applyChanges = () => {
     const domainChanges = parse(entityCSV, {columns: true})
 
-    for (let row of domainChanges) {
+    for (const row of domainChanges) {
         // ignore rows that haven't been validated
         if (row.acceptChange !== '1') {
             continue
@@ -18,7 +18,7 @@ const applyChanges = () => {
         const oldName = row.existingEntityName
         const name = row.newEntityName
         const shortName = row.displayName
-        let oldEntity = entityMap[oldName] ? entityMap[oldName] : {}
+        const oldEntity = entityMap[oldName] ? entityMap[oldName] : {}
         let newEntity = entityMap[name]
 
         // remove old entity if exists, merge into new one
@@ -45,8 +45,8 @@ const applyChanges = () => {
 }
 
 const generateDomainMap = updatedEntityMap => {
-    let newDomainMap = {}
-    for (let name in updatedEntityMap) {
+    const newDomainMap = {}
+    for (const name in updatedEntityMap) {
         const entity = updatedEntityMap[name]
         entity.properties.forEach(d => {
             newDomainMap[d] = {entityName: name, aliases: entity.aliases}
@@ -58,7 +58,7 @@ const generateDomainMap = updatedEntityMap => {
 const exportEntities = updatedEntityMap => {
     // remove existing entity files
     fs.emptyDirSync(entityDir)
-    for (let entity in updatedEntityMap) {
+    for (const entity in updatedEntityMap) {
         const entityData = updatedEntityMap[entity]
         const shortName = entityData.displayName || ''
         const domains = entityData.properties

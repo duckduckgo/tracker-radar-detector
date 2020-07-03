@@ -2,7 +2,7 @@
 // The cutoffs for each bucket were determined manually by looking
 // at previous crawl data.
 function getFingerprintRank (fp) {
-    if (!fp) return 0
+    if (!fp) {return 0}
 
     const logFp = Math.log(fp)
     let bucket = 0

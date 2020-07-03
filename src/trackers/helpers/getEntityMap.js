@@ -1,7 +1,7 @@
 /* domain -> entity mapping */
 const fs = require('fs')
 
-const entityMap = (entityDataLoc) => {
+const entityMap = entityDataLoc => {
     const entityFiles = fs.readdirSync(entityDataLoc)
     const map = new Map()
 
@@ -15,5 +15,5 @@ const entityMap = (entityDataLoc) => {
 }
 
 module.exports = {
-    entityMap: entityMap
+    entityMap
 }
