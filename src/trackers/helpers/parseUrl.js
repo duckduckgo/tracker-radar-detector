@@ -28,11 +28,11 @@ class URL {
         }
     }
 
-    // Format and parse the URL. In cases where the scheme is missing
-    // attempt to guess it.
-    // @param {string} url - url to parse
-    // 
-    // @return {urlParse.URL} The parsed URL
+    /**
+     * Format and parse the URL. In cases where the scheme is missing attempt to guess it.
+     * @param {string} url - url to parse
+     * @return {urlParse.URL} The parsed URL
+     */
     static parse(url) {
         let urlData
         try {
