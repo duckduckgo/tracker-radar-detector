@@ -21,18 +21,16 @@ class URL {
         this.hostname = tldObj.hostname || tldsObj.host
         this.subdomain = tldObj.subdomain || tldsObj.subdomain
         try {
-          const urlData = URL.parse(url)
-          this.path = urlData.pathname
+            const urlData = URL.parse(url)
+            this.path = urlData.pathname
         } catch(e) {
             console.warn(`\nSkipping unparsable url: ${url}`)
         }
     }
 
-    /*
-     * Format and parse the URL. In cases where the scheme is missing
-     * attempt to guess it.
+    /**
+     * Format and parse the URL. In cases where the scheme is missing attempt to guess it.
      * @param {string} url - url to parse
-     *
      * @return {urlParse.URL} The parsed URL
      */
     static parse(url) {
@@ -42,8 +40,7 @@ class URL {
         } catch (e) {
             if (e instanceof TypeError) {
                 urlData = new urlParse.URL("http://" + url)
-            }
-            else {
+            } else {
                 console.log(`error for ${url}`)
                 throw e
             }
@@ -53,18 +50,18 @@ class URL {
 
 }
 
-function manualCases (URL) {
+function manualCases (url) {
     // regex key to correct domain value
     const cases = {
-        ".*\\.amazonaws\\.com$" : 'amazonaws.com',
-        ".*\\.cloudfront\\.net$" : 'cloudfront.net',
-        ".*\\.googleapis.com$" : 'googleapis.com'
+        ".*\\.amazonaws\\.com$": 'amazonaws.com',
+        ".*\\.cloudfront\\.net$": 'cloudfront.net',
+        ".*\\.googleapis.com$": 'googleapis.com'
     }
 
     for (const [re, domain] of Object.entries(cases)) {
-        if(URL.domain && URL.domain.match(re)) {
-            //console.log(`manual domain ${URL.domain} to ${domain}`)
-            URL.domain = domain
+        if(url.domain && url.domain.match(re)) {
+            //console.log(`manual domain ${url.domain} to ${domain}`)
+            url.domain = domain
         }
     }
 }

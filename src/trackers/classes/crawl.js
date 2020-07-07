@@ -102,7 +102,7 @@ function _getCommonRequestKey (request) {
 
 // build a single object with domain prevalence, fingerprint, and cookie data
 function _getDomainSummaries (crawl) {
-    let domainSummary = {}
+    const domainSummary = {}
     // calculate prevalence
     Object.keys(crawl.domainPrevalence).forEach(domain => {
         domainSummary[domain] = {prevalence: 0, cookies: 0, fp: 0}
@@ -129,7 +129,7 @@ function _getEntitySummaries (crawl) {
     delete crawl.entityPrevalence.undefined
 
     // calculate the overall entity prevalence
-    for (let entity of Object.keys(crawl.entityPrevalence)) {
+    for (const entity of Object.keys(crawl.entityPrevalence)) {
         crawl.entityPrevalence[entity].total =
             +((crawl.entityPrevalence[entity].tracking + crawl.entityPrevalence[entity].nonTracking)/crawl.stats.sites).toPrecision(3)
             

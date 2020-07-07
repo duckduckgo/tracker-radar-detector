@@ -43,7 +43,7 @@ class Site {
 function _getCookies (siteData) {
     return  siteData.data.cookies.reduce((cookieObj, cookie) => {
        // some domains will have a leading period we need to remove
-        let cookieHost = new ParsedUrl(`http://${cookie.domain.replace(/^\./,'')}`).hostname
+        const cookieHost = new ParsedUrl(`http://${cookie.domain.replace(/^\./,'')}`).hostname
         cookieObj[`${cookieHost}${cookie.path}`]
         return cookieObj
     }, [])
@@ -55,8 +55,8 @@ function _getCookies (siteData) {
  * @returns {bool} True if the url is in this sites first party set.
  */
 function _isFirstParty(url) {
-    let data = new ParsedUrl(url)
-    let dataOwner = shared.entityMap.get(data.domain)
+    const data = new ParsedUrl(url)
+    const dataOwner = shared.entityMap.get(data.domain)
     if (data.domain === this.domain || ((dataOwner && this.owner) && dataOwner === this.owner)) {
         return true
     }
@@ -118,7 +118,7 @@ function isRootSite(request, site) {
  *  @param {Site} site - the current site object
  */
 async function _processRequest (requestData, site) {
-    let request = new Request(requestData, site)
+    const request = new Request(requestData, site)
 
     // If this request is a subdomain of the site, see if it is cnamed
     if (site.isFirstParty(request.url) &&
@@ -126,12 +126,12 @@ async function _processRequest (requestData, site) {
         !isRootSite(request, site) &&
         !cnameHelper.isSubdomainExcluded(request.data)
         ) {
-        let cnames = await cnameHelper.resolveCname(request.url)
+        const cnames = await cnameHelper.resolveCname(request.url)
         if(cnames) {
-            for (let cname of cnames) {
+            for (const cname of cnames) {
                 if (!site.isFirstParty(cname)) {
                     // console.log(`Third Party CNAME: ${request.data.subdomain}.${request.data.domain} -> ${cname}`)
-                    let origSubDomain = request.data.subdomain + "." + request.data.domain
+                    const origSubDomain = request.data.subdomain + "." + request.data.domain
                     site.cnameCloaks[cname] = request.data.subdomain + "." + request.data.domain
                     request.extractURLData(cname)
                     request.wasCNAME = true

@@ -61,7 +61,7 @@ function _update (commonReq, newReq, site) {
         }
 
         if (newReq.wasCNAME) {
-            let record = cname.createCnameRecord(newReq)
+            const record = cname.createCnameRecord(newReq)
             if (!cname.containsCnameRecord(commonReq.cnames, record)) {
                 commonReq.cnames.push(record)
             }
@@ -70,7 +70,7 @@ function _update (commonReq, newReq, site) {
 }
 
 function _combineApis (currApis, newApis) {
-    for (let api in newApis) {
+    for (const api in newApis) {
         if (currApis[api]) {
             currApis[api]++
         } else {

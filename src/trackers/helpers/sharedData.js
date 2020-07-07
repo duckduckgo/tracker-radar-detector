@@ -5,19 +5,19 @@ const config = require('./../../../config.json')
 const categoryHelper = require(`./getCategory.js`)
 const entityHelper = require('./getEntityMap.js')
 const ParsedUrl = require('./parseUrl.js')
-class sharedData {
-    constructor (config) {
+class SharedData {
+    constructor (cfg) {
         console.log(chalk.green("Reading static data"))
-        const build = `${config.trackerDataLoc}/build-data`
+        const build = `${cfg.trackerDataLoc}/build-data`
 
-        this.config = config
+        this.config = cfg
         this.policies = _getJSON(`${build}/static/privacy_policies.json`)
         this.surrogates = _getJSON(`${build}/static/surrogates.json`)
         this.domains = _getJSON(`${build}/generated/domain_summary.json`) || {}
         this.abuseScores = _getJSON(`${build}/static/api_fingerprint_weights.json`)
         this.categories = _getCategories()
         this.domainToEntity = _readEntities()
-        this.entityMap = entityHelper.entityMap(`${config.trackerDataLoc}/entities`)
+        this.entityMap = entityHelper.entityMap(`${cfg.trackerDataLoc}/entities`)
         this.breaking = _getBreaking(`${build}/static/breaking`)
     }
 }
@@ -34,7 +34,7 @@ function _readEntities () {
 }
 
 // read tracker category data from csv and return object
-function _getCategories (domain) {
+function _getCategories () {
     return categoryHelper.getCategories(`${config.trackerDataLoc}/build-data/static/categorized_trackers.csv`)
 }
 
@@ -47,7 +47,7 @@ function _getBreaking (dirPath) {
         const data = _getJSON(`${dirPath}/${file}`)
 
         // group the breaking request type data by domain for faster look up
-        if (file.match('breaking-request')){
+        if (file.match('breaking-request')) {
             const groupedData = data.reduce((grouped, entry) => {
                 // unescape and get domain key
                 const domain = new ParsedUrl(`http://${entry.rule.replace(/\\/g, "")}`).domain
@@ -72,4 +72,4 @@ function _getJSON (path) {
     }
 }
 
-module.exports = new sharedData (config)
+module.exports = new SharedData(config)

@@ -10,7 +10,7 @@ const Site = require('./classes/site.js')
 console.log(`Reading crawl from: ${sharedData.config.crawlerDataLoc}`)
 
 // get site file list
-let siteFileList = fs.readdirSync(sharedData.config.crawlerDataLoc)
+const siteFileList = fs.readdirSync(sharedData.config.crawlerDataLoc)
 
 const bar = new Progress('Process crawl [:bar] :percent', {width: 40, total: siteFileList.length})
 
@@ -30,7 +30,7 @@ async function processSite(siteName) {
 
     const site = new Site(siteData)
 
-    for (let request of siteData.data.requests) {
+    for (const request of siteData.data.requests) {
         await site.processRequest(request)
         crawl.stats.requests++
     }
@@ -45,8 +45,8 @@ async function processCrawl(fileList) {
     console.time("runtime")
     
     for (let i=0; i < fileList.length; i += sharedData.config.parallelism) {
-        let sites = []
-        for (let site of fileList.slice(i, i + sharedData.config.parallelism)) {
+        const sites = []
+        for (const site of fileList.slice(i, i + sharedData.config.parallelism)) {
             sites.push(processSite(site))
         }
         await Promise.allSettled(sites)
