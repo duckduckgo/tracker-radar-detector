@@ -94,6 +94,7 @@ function _finalize (request, totalSites) {
 
     delete request.fpPerSite
     delete request.pages
+//    request.pages = [...request.pages]
     request.subdomains = [...request.subdomains]
 }
 

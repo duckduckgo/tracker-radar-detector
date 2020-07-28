@@ -144,7 +144,23 @@ function _getEntitySummaries (crawl) {
 function _writeSummaries (crawl) {
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/domain_summary.json`, JSON.stringify(_getDomainSummaries(crawl), null, 4))
 
-    fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests.json`, JSON.stringify({stats: crawl.stats, requests: crawl.commonRequests}, null, 4))
+    // split up common request file
+    let files = []
+    const keys = chunkKeys(Object.keys(crawl.commonRequests),25)
+    for (const fileIdx in keys) {
+        for (const rKey in keys[fileIdx]) {
+            if (!files[fileIdx]) {
+                files[fileIdx] = {}
+            }
+            const requestKey = keys[fileIdx][rKey]
+            files[fileIdx][requestKey] = crawl.commonRequests[requestKey]
+        }
+    }
+
+    files.forEach((val, idx) => {
+        fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests.${idx}.json`, JSON.stringify({stats: crawl.stats, requests: files[idx]}, null, 4))
+        console.log(`wrote commonrequests ${idx}`)
+    })
 
     _getEntitySummaries(crawl)
 
@@ -185,3 +201,15 @@ function updateEntityPrevalence (crawl) {
 }
 
 module.exports = new Crawl()
+
+function chunkKeys(keys, buckets){
+    let index = 0
+    const keyLength = keys.length
+    buckets = keyLength / buckets
+    let tempArray = []
+    for (index = 0; index < keyLength; index += buckets) {
+        myChunk = keys.slice(index, index+buckets)
+        tempArray.push(myChunk);
+    }
+    return tempArray
+}

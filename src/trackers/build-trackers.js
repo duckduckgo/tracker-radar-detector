@@ -3,8 +3,29 @@ const fs = require('fs')
 const chalk = require('chalk')
 const sharedData = require('./helpers/sharedData.js')
 const Progress = require('progress')
+const glob = require('glob')
+const newData = {requests:{}}
 
-const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
+glob(`${sharedData.config.trackerDataLoc}/commonRequests*.json`, (err, files) => {
+    if (err) {
+        console.log(err)
+    } else {
+        files.forEach((file) => {
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'))
+            
+            // each file has the same stats, only need it once
+            if (!newData.stats) newData.stats = data.stats
+
+            // combine requests lists from each file. Requests are all unique so no replacement happens
+            newData.requests = Object.assign(newData.requests, data.requests)
+        })
+    }
+
+    run()
+})
+
+function run () {
+
 const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
 const countryCode = crawlMetadata.config.regionCode || 'US'
 const crawledSiteTotal = newData.stats.sites
@@ -70,6 +91,7 @@ if (!fs.existsSync(`${sharedData.config.trackerDataLoc}/build-data/generated/${c
 }
 
 fs.writeFileSync(`${sharedData.config.trackerDataLoc}/build-data/generated/${countryCode}/releasestats.txt`, `${summary.trackers} domains\n${summary.entities.length} entities`)
+}
 
 function log (msg) {
     if (sharedData.config.verbose) {

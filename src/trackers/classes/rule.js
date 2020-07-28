@@ -11,6 +11,7 @@ class Rule {
         this.sites = newRuleData.sites
         this.prevalence = +(newRuleData.sites / totalSites).toPrecision(3)
         this.cnames = newRuleData.cnames
+        this.type = newRuleData.type
     }
 }
 
