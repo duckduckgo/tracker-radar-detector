@@ -10,5 +10,6 @@
     "treatCnameAsFirstParty": false,
     "parallelism": 100,
     "verbose": false,
-    "cname_ignore_subdomains": ["", "www"]
+    "cname_ignore_subdomains": ["", "www"],
+    "includePages": true
 }

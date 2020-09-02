@@ -1,4 +1,5 @@
 const cname = require('./../helpers/cname.js')
+const sharedData = require('./../helpers/sharedData.js')
 
 class CommonRequest {
     constructor (request, site) {
@@ -93,7 +94,11 @@ function _finalize (request, totalSites) {
     request.fpStd = Math.sqrt(sumSquare / (request.fpPerSite.length - 1)) || 0
 
     delete request.fpPerSite
-    delete request.pages
+
+    if (!sharedData.config.includePages) {
+        delete request.pages
+    }
+    
     request.subdomains = [...request.subdomains]
 }
 
