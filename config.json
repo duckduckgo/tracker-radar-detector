@@ -11,5 +11,6 @@
     "parallelism": 100,
     "verbose": false,
     "cname_ignore_subdomains": ["", "www"],
-    "includePages": true
+    "includePages": true,
+    "pageMapLoc": ""
 }

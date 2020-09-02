@@ -2,6 +2,7 @@ const fs = require('fs')
 const {median, std} = require('mathjs')
 const shared = require('./../helpers/sharedData.js')
 const CommonRequest = require('./commonRequest.js')
+const sharedData = require('./../helpers/sharedData.js')
 
 class Crawl {
     constructor () {
@@ -27,6 +28,8 @@ class Crawl {
 
         // Sites that are CNAME cloaked as first party.
         this.domainCloaks = {}
+
+        this.pageMap = {}
     }
     
     writeSummaries () {
@@ -43,6 +46,9 @@ class Crawl {
                 delete this.commonRequests[key]
                 continue
             }
+
+            this.pageMap[request.host] = request.pages
+
             request.finalize(this.stats.sites)
         }
     }
@@ -149,6 +155,10 @@ function _writeSummaries (crawl) {
     _getEntitySummaries(crawl)
 
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.json`, JSON.stringify(crawl.entityPrevalence, null, 4))
+
+    if (shared.config.includePages) {
+        fs.writeFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, JSON.stringify(crawl.pageMap, null, 4))
+    }
 
     // write entity prevalence csv
     let csv = []
