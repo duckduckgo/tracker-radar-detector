@@ -47,7 +47,7 @@ class Crawl {
                 continue
             }
 
-            this.pageMap[request.host] = [...request.pages]
+            this.pageMap[request.rule] = [...request.pages]
 
             request.finalize(this.stats.sites)
         }

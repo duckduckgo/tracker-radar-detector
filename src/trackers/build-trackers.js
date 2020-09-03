@@ -6,6 +6,7 @@ const Progress = require('progress')
 
 const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
 const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
+const requestPageMap = JSON.parse(fs.readFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, 'utf-8'))
 const countryCode = crawlMetadata.config.regionCode || 'US'
 const crawledSiteTotal = newData.stats.sites
 const summary = {trackers: 0, entities: []}
@@ -13,6 +14,7 @@ const summary = {trackers: 0, entities: []}
 const Tracker = require(`./classes/tracker.js`)
 const Rule = require(`./classes/rule.js`)
 const trackers = {}
+const trackerPageMap = {}
 
 const bar = new Progress('Building trackers [:bar] :percent', {width: 40, total: Object.keys(newData.requests).length})
 
@@ -39,10 +41,12 @@ for (const key in newData.requests) {
         // add this file so we know we now have an existing entry for this tracker
         trackers[fileName] = tracker
         summary.trackers++
+        trackerPageMap[tracker.domain] = [...requestPageMap[rule.rule]]
     } else {
         log(`${chalk.blue('update tracker')} ${fileName}`)
         trackers[fileName].addRule(rule)
         trackers[fileName].addTypes(newTrackerData.type, newTrackerData.sites)
+        trackerPageMap[trackers[fileName].domain].push(...requestPageMap[rule.rule])
     }
         
     if(!summary.entities.includes(trackers[fileName].owner.name)) {
@@ -60,6 +64,8 @@ for (const [fileName, tracker] of Object.entries(trackers)) {
     const filePath = `${sharedData.config.trackerDataLoc}/domains/${countryCode}/${fileName}`
     fs.writeFileSync(filePath, JSON.stringify(tracker, null, 4))
 }
+
+fs.writeFileSync(`${sharedData.config.pageMapLoc}/trackerpagemap.json`, JSON.stringify(tracker, null, 4))
 
 console.log(`Found ${summary.trackers} ${chalk.green("trackers")}`)
 console.log(`Found ${summary.entities.length} ${chalk.green("entities")}`)
