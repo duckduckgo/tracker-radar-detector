@@ -1,6 +1,4 @@
 const cname = require('./../helpers/cname.js')
-const sharedData = require('./../helpers/sharedData.js')
-const { delete } = require('request')
 
 class CommonRequest {
     constructor (request, site) {
@@ -46,18 +44,18 @@ function _escapeUrl (request) {
 
 function _update (commonReq, newReq, site) {
     // update common request with new data only once for each site. If a site has 100s of requests
-    // for tracker.js, we're only going to count one of them 
+    // for tracker.js, we're only going to count one of them
     if (!commonReq.pages.has(site.host)) {
         commonReq.sites++
         commonReq.apis = _combineApis(commonReq.apis, newReq.apis)
-        
+
         if(newReq.data.subdomain) {
             commonReq.subdomains.add(newReq.data.subdomain)
         }
 
         commonReq.pages.add(site.host)
         commonReq.fpPerSite.push(newReq.fingerprintScore)
-        
+
         if (newReq.setsCookies) {
             commonReq.cookiesOn++
         }
@@ -96,7 +94,7 @@ function _finalize (request, totalSites) {
 
     delete request.fpPerSite
     delete request.pages
-    
+
     request.subdomains = [...request.subdomains]
 }
 
