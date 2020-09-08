@@ -12,5 +12,5 @@
     "verbose": false,
     "cname_ignore_subdomains": ["", "www"],
     "includePages": true,
-    "pageMapLoc": "/home/bslayter"
+    "pageMapLoc": "path to store page maps"
 }
