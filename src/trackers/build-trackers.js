@@ -6,10 +6,18 @@ const Progress = require('progress')
 
 const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
 const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
-const requestPageMap = JSON.parse(fs.readFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, 'utf-8'))
 const countryCode = crawlMetadata.config.regionCode || 'US'
 const crawledSiteTotal = newData.stats.sites
 const summary = {trackers: 0, entities: []}
+
+let requestPageMap = {}
+try {
+    requestPageMap = JSON.parse(fs.readFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, 'utf-8'))
+} catch (e) {
+    if (sharedData.config.includePages) {
+        console.error('Could not load request page map: ', e);
+    }
+}
 
 const Tracker = require(`./classes/tracker.js`)
 const Rule = require(`./classes/rule.js`)
@@ -65,7 +73,9 @@ for (const [fileName, tracker] of Object.entries(trackers)) {
     fs.writeFileSync(filePath, JSON.stringify(tracker, null, 4))
 }
 
-fs.writeFileSync(`${sharedData.config.pageMapLoc}/trackerpagemap.json`, JSON.stringify(trackerPageMap, null, 4))
+if (sharedData.config.includePages) {
+    fs.writeFileSync(`${sharedData.config.pageMapLoc}/trackerpagemap.json`, JSON.stringify(trackerPageMap, null, 4))
+}
 
 console.log(`Found ${summary.trackers} ${chalk.green("trackers")}`)
 console.log(`Found ${summary.entities.length} ${chalk.green("entities")}`)
