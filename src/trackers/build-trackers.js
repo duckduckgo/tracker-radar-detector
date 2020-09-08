@@ -18,7 +18,7 @@ const trackerPageMap = {}
 
 const bar = new Progress('Building trackers [:bar] :percent', {width: 40, total: Object.keys(newData.requests).length})
 
-// Run through all the new trackers in our crawl data. 
+// Run through all the new trackers in our crawl data.
 // Either create a new tracker entry or update an existing
 for (const key in newData.requests) {
     const newTrackerData = newData.requests[key]
@@ -48,7 +48,7 @@ for (const key in newData.requests) {
         trackers[fileName].addTypes(newTrackerData.type, newTrackerData.sites)
         trackerPageMap[trackers[fileName].domain].push(...requestPageMap[rule.rule])
     }
-        
+
     if(!summary.entities.includes(trackers[fileName].owner.name)) {
         summary.entities.push(trackers[fileName].owner.name)
     }
@@ -65,7 +65,7 @@ for (const [fileName, tracker] of Object.entries(trackers)) {
     fs.writeFileSync(filePath, JSON.stringify(tracker, null, 4))
 }
 
-fs.writeFileSync(`${sharedData.config.pageMapLoc}/trackerpagemap.json`, JSON.stringify(tracker, null, 4))
+fs.writeFileSync(`${sharedData.config.pageMapLoc}/trackerpagemap.json`, JSON.stringify(trackerPageMap, null, 4))
 
 console.log(`Found ${summary.trackers} ${chalk.green("trackers")}`)
 console.log(`Found ${summary.entities.length} ${chalk.green("entities")}`)
