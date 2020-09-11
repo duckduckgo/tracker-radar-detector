@@ -10,13 +10,23 @@ const countryCode = crawlMetadata.config.regionCode || 'US'
 const crawledSiteTotal = newData.stats.sites
 const summary = {trackers: 0, entities: []}
 
+let requestPageMap = {}
+try {
+    requestPageMap = JSON.parse(fs.readFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, 'utf-8'))
+} catch (e) {
+    if (sharedData.config.includePages) {
+        console.error('Could not load request page map: ', e)
+    }
+}
+
 const Tracker = require(`./classes/tracker.js`)
 const Rule = require(`./classes/rule.js`)
 const trackers = {}
+const trackerPageMap = {}
 
 const bar = new Progress('Building trackers [:bar] :percent', {width: 40, total: Object.keys(newData.requests).length})
 
-// Run through all the new trackers in our crawl data. 
+// Run through all the new trackers in our crawl data.
 // Either create a new tracker entry or update an existing
 for (const key in newData.requests) {
     const newTrackerData = newData.requests[key]
@@ -39,12 +49,14 @@ for (const key in newData.requests) {
         // add this file so we know we now have an existing entry for this tracker
         trackers[fileName] = tracker
         summary.trackers++
+        trackerPageMap[tracker.domain] = [...requestPageMap[rule.rule]]
     } else {
         log(`${chalk.blue('update tracker')} ${fileName}`)
         trackers[fileName].addRule(rule)
         trackers[fileName].addTypes(newTrackerData.type, newTrackerData.sites)
+        trackerPageMap[trackers[fileName].domain].push(...requestPageMap[rule.rule])
     }
-        
+
     if(!summary.entities.includes(trackers[fileName].owner.name)) {
         summary.entities.push(trackers[fileName].owner.name)
     }
@@ -59,6 +71,10 @@ if (!fs.existsSync(`${sharedData.config.trackerDataLoc}/domains/${countryCode}`)
 for (const [fileName, tracker] of Object.entries(trackers)) {
     const filePath = `${sharedData.config.trackerDataLoc}/domains/${countryCode}/${fileName}`
     fs.writeFileSync(filePath, JSON.stringify(tracker, null, 4))
+}
+
+if (sharedData.config.includePages) {
+    fs.writeFileSync(`${sharedData.config.pageMapLoc}/trackerpagemap.json`, JSON.stringify(trackerPageMap, null, 4))
 }
 
 console.log(`Found ${summary.trackers} ${chalk.green("trackers")}`)

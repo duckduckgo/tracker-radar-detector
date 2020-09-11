@@ -2,6 +2,7 @@ const fs = require('fs')
 const {median, std} = require('mathjs')
 const shared = require('./../helpers/sharedData.js')
 const CommonRequest = require('./commonRequest.js')
+const sharedData = require('./../helpers/sharedData.js')
 
 class Crawl {
     constructor () {
@@ -27,8 +28,10 @@ class Crawl {
 
         // Sites that are CNAME cloaked as first party.
         this.domainCloaks = {}
+
+        this.pageMap = {}
     }
-    
+
     writeSummaries () {
         _writeSummaries(this)
     }
@@ -43,6 +46,9 @@ class Crawl {
                 delete this.commonRequests[key]
                 continue
             }
+
+            this.pageMap[request.rule] = [...request.pages]
+
             request.finalize(this.stats.sites)
         }
     }
@@ -52,7 +58,7 @@ function _processSite (crawl, site) {
     // go through the uniqueDomains found on the site and update the crawl domain prevalence, fingerprinting, and cookies
     Object.keys(site.uniqueDomains).forEach(domain => {
         crawl.domainPrevalence[domain] ? crawl.domainPrevalence[domain] += 1 : crawl.domainPrevalence[domain] = 1
-        
+
         if (crawl.domainFingerprinting[domain]) {
             crawl.domainFingerprinting[domain].push(site.uniqueDomains[domain].fingerprinting)
         } else {
@@ -132,9 +138,9 @@ function _getEntitySummaries (crawl) {
     for (const entity of Object.keys(crawl.entityPrevalence)) {
         crawl.entityPrevalence[entity].total =
             +((crawl.entityPrevalence[entity].tracking + crawl.entityPrevalence[entity].nonTracking)/crawl.stats.sites).toPrecision(3)
-            
+
         crawl.entityPrevalence[entity].tracking = +(crawl.entityPrevalence[entity].tracking/crawl.stats.sites).toPrecision(3)
-         
+
         crawl.entityPrevalence[entity].nonTracking = +(crawl.entityPrevalence[entity].nonTracking/crawl.stats.sites).toPrecision(3)
     }
 
@@ -149,6 +155,10 @@ function _writeSummaries (crawl) {
     _getEntitySummaries(crawl)
 
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.json`, JSON.stringify(crawl.entityPrevalence, null, 4))
+
+    if (shared.config.includePages) {
+        fs.writeFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, JSON.stringify(crawl.pageMap, null, 4))
+    }
 
     // write entity prevalence csv
     let csv = []
