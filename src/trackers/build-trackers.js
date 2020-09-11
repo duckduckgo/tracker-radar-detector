@@ -15,7 +15,7 @@ try {
     requestPageMap = JSON.parse(fs.readFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, 'utf-8'))
 } catch (e) {
     if (sharedData.config.includePages) {
-        console.error('Could not load request page map: ', e);
+        console.error('Could not load request page map: ', e)
     }
 }
 
