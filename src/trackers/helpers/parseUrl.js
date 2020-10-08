@@ -8,7 +8,7 @@ class URL {
         url = url.replace(/^blob:/, '')
         
         const tldObj = tldjs.parse(url)
-        const tldsObj = tldts.parse(url, {allowPrivateDomains: false})
+        const tldsObj = tldts.parse(url, {allowPrivateDomains: true})
 
         if (tldsObj.isIp) {
             this.domain = tldsObj.host
@@ -16,33 +16,39 @@ class URL {
             this.domain = tldsObj.domain || tldObj.domain
         }
 
-        manualCases(this)
-
         this.hostname = tldObj.hostname || tldsObj.host
         this.subdomain = tldObj.subdomain || tldsObj.subdomain
         try {
-            this.path = new urlParse.URL(url).pathname
+          const urlData = URL.parse(url)
+          this.path = urlData.pathname
         } catch(e) {
             console.warn(`\nSkipping unparsable url: ${url}`)
         }
     }
 
-}
-
-function manualCases (URL) {
-    // regex key to correct domain value
-    const cases = {
-        ".*\\.amazonaws\\.com$" : 'amazonaws.com',
-        ".*\\.cloudfront\\.net$" : 'cloudfront.net',
-        ".*\\.googleapis.com$" : 'googleapis.com'
-    }
-
-    for (const [re, domain] of Object.entries(cases)) {
-        if(URL.domain && URL.domain.match(re)) {
-            //console.log(`manual domain ${URL.domain} to ${domain}`)
-            URL.domain = domain
+    /*
+     * Format and parse the URL. In cases where the scheme is missing
+     * attempt to guess it.
+     * @param {string} url - url to parse
+     *
+     * @return {urlParse.URL} The parsed URL
+     */
+    static parse(url) {
+        let urlData
+        try {
+            urlData = new urlParse.URL(url)
+        } catch (e) {
+            if (e instanceof TypeError) {
+                urlData = new urlParse.URL("http://" + url)
+            }
+            else {
+                console.log(`error for ${url}`)
+                throw e
+            }
         }
+        return urlData
     }
+
 }
 
 module.exports = URL

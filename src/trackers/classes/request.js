@@ -3,25 +3,31 @@ const ParsedUrl = require('./../helpers/parseUrl.js')
 
 class Request {
     constructor (reqData, site) {
-        this.url = reqData.url
+        this.site = site
+        this.extractURLData(reqData.url)
         this.type = reqData.type
-        this.data = new ParsedUrl(this.url)
-        this.domain = this.data.domain
-        this.host = this.data.hostname
-        this.path = this.data.path
-
-        this.owner = _getRequestOwner(this.data.domain)
-
         this.headers = reqData.responseHeaders || {}
-
-        this.apis = site.siteData.data.apis.callStats[this.url] || {}
-
         this.setsCookies = _setsCookies(this)
-
         this.isTracking = false
         this.fingerprintScore = _getFPScore(Object.keys(this.apis))
+        // if this request uses a third party CNAME, keep data here
+        this.wasCNAME = false
+        this.originalSubdomain = undefined
+        this.responseHash = reqData.responseBodyHash
+    }
 
-        this.isFirstParty = _isFirstParty(this, site)
+    /**
+     * Extract relevant data from the URL. Sets properties of object.
+     * @param {string} url - the URL to analyze
+     */
+    extractURLData(url) {
+        this.url = url
+        this.data = new ParsedUrl(url)
+        this.domain = this.data.domain
+        this.host = this.data.hostname
+        this.path = this.path || this.data.path
+        this.owner = _getRequestOwner(this.data.domain)
+        this.apis = this.site.siteData.data.apis.callStats[url] || {}
     }
 }
 
@@ -36,14 +42,6 @@ function _getFPScore (apis) {
         totalFP += shared.abuseScores[api] || 1
         return totalFP
     },0)
-}
-
-function _isFirstParty (req, site) {
-    if (req.domain === site.domain || ((req.owner && site.owner) && req.owner === site.owner)) {
-        return true
-    }
-    return false
-    
 }
 
 function _setsCookies (req) {

@@ -25,6 +25,8 @@ class Crawl {
         // summary of 3p requests seen in the crawl
         this.commonRequests = {}
 
+        // Sites that are CNAME cloaked as first party.
+        this.domainCloaks = {}
     }
     
     writeSummaries () {
@@ -59,6 +61,10 @@ function _processSite (crawl, site) {
 
         if (site.uniqueDomains[domain].setsCookies) {
             crawl.domainCookies[domain] ? crawl.domainCookies[domain]++ : crawl.domainCookies[domain] = 1
+        }
+
+        if (site.uniqueDomains[domain].usesCNAMECloaking) {
+            crawl.domainCloaks[domain] ? crawl.domainCloaks[domain]++ : crawl.domainCloaks[domain] = 1
         }
     })
 
@@ -109,6 +115,11 @@ function _getDomainSummaries (crawl) {
     // calculate average fp
     Object.keys(crawl.domainFingerprinting).forEach(domain => {
         domainSummary[domain].fp = median(crawl.domainFingerprinting[domain]) + std(crawl.domainFingerprinting[domain])
+    })
+
+    // How often does this domain appear cloaked?
+    Object.keys(crawl.domainCloaks).forEach(domain => {
+        domainSummary[domain].cloaked = crawl.domainCloaks[domain] / crawl.domainPrevalence[domain]
     })
 
     return domainSummary

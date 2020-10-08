@@ -1,3 +1,5 @@
+const cname = require('./../helpers/cname.js')
+
 class CommonRequest {
     constructor (request, site) {
         this.host = request.domain
@@ -19,6 +21,9 @@ class CommonRequest {
         this.cookies = 0
         this.fpStd = 0
         this.fpAvg = 0
+        this.cnames = request.wasCNAME ? [cname.createCnameRecord(request)] : []
+
+        this.responseHashes = []
     }
 
     update (request, site) {
@@ -39,6 +44,8 @@ function _escapeUrl (request) {
     return rule.replace(/(\(|\)|\/|\?|\.|\||\[)/g,'\\$1')
 }
 
+
+
 function _update (commonReq, newReq, site) {
     // update common request with new data only once for each site. If a site has 100s of requests
     // for tracker.js, we're only going to count one of them 
@@ -55,6 +62,18 @@ function _update (commonReq, newReq, site) {
         
         if (newReq.setsCookies) {
             commonReq.cookiesOn++
+        }
+
+        if (newReq.wasCNAME) {
+            let record = cname.createCnameRecord(newReq)
+            if (!cname.containsCnameRecord(commonReq.cnames, record)) {
+                commonReq.cnames.push(record)
+            }
+        }
+
+
+        if (newReq.responseHash && !commonReq.responseHashes.includes(newReq.responseHash)) {
+            commonReq.responseHashes.push(newReq.responseHash)
         }
     }
 }

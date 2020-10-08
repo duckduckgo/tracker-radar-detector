@@ -2,6 +2,7 @@ const tldjs = require('tldjs')
 const performanceHelper = require('./../helpers/getPerformance.js')
 const sharedData = require('./../helpers/sharedData.js')
 const getFpRank = require('./../helpers/getFingerprintRank.js')
+const cname = require('./../helpers/cname.js')
 
 class Tracker {
     constructor(trackerData, crawledSiteTotal) {
@@ -14,13 +15,13 @@ class Tracker {
         this.prevalence = +prevalence.toPrecision(3)
         this.sites = Math.round(prevalence * crawledSiteTotal)
         this.subdomains = []
+        this.cnames = []
 
         this.fingerprinting = getFpRank(sharedData.domains[this.domain].fp || 0)
         this.resources = []
         this.categories = _getCategories(this.domain) || []
         this.performance = performanceHelper.getPerformance(this.domain, sharedData.config.performanceDataLoc) || {}
         this.cookies = +(_getCookies(this.domain).toPrecision(3))
-
 
         let policy = _getPolicy(this.domain, this.owner)
         
@@ -50,6 +51,12 @@ class Tracker {
     addRule (rule) {
         this.resources.push(rule)
         this.subdomains = [...new Set(this.subdomains.concat(rule.subdomains))]
+        rule.cnames.forEach(record => {
+            if (!cname.containsCnameRecord(this.cnames, record)) {
+                this.cnames.push(record)
+            }
+        })
+        this.cnames.sort((a,b) => a.original.localeCompare(b.original))
     }
 
     addSurrogates () {
@@ -67,15 +74,31 @@ function _getPolicy (domain, owner={}) {
 }
 
 function _getEntity (domain) {
-    return sharedData.domainToEntity[domain] || {}
+    if (!domain) return {}
+
+    if (sharedData.domainToEntity[domain]) {
+        return sharedData.domainToEntity[domain]
+    } else {
+        const parts = domain.split('.')
+        parts.shift()
+        return _getEntity(parts.join('.'))
+    }
 }
 
 function _getCategories (domain) {
-    if (sharedData.categories[domain]) {
+    if (!domain) {
+        return []
+    }
+
+    if (sharedData.categories[domain]) {    
         return Object.keys(sharedData.categories[domain]).reduce((cats, key) => {
             if (sharedData.categories[domain][key]) {cats.push(key)}
             return cats
         },[])
+    } else {
+        const parts = domain.split('.')
+        parts.shift()
+        return _getCategories(parts.join('.'))
     }
 }
 
