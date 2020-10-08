@@ -8,11 +8,11 @@ const sortedCorpList = corpList.sort((a,b) => {return b.length - a.length})
 function getDisplayName(name) {
     let shortName = name
     // check to see if name is all caps and a non-caps equivalent alias exists
-    if (name.toLocaleUpperCase() === name && (entityMap[name] && entityMap[name]['aliases'].length > 1)) {
-        let aliases = entityMap[name]['aliases']
+    if (name.toLocaleUpperCase() === name && (entityMap[name] && entityMap[name].aliases.length > 1)) {
+        const aliases = entityMap[name].aliases
         for (const index in aliases) {
-            let aliasNoPunct = aliases[index].toLocaleLowerCase().replace(/\+|\/|\&|\.|-|\+| /g, '')
-            let nameNoPunct = name.toLocaleLowerCase().replace(/\+|\/|\&|\.|-|\+| /g, '')
+            const aliasNoPunct = aliases[index].toLocaleLowerCase().replace(/\+|\/|&|\.|-|\+| /g, '')
+            const nameNoPunct = name.toLocaleLowerCase().replace(/\+|\/|&|\.|-|\+| /g, '')
             if (name !== aliases[index] && nameNoPunct === aliasNoPunct) {
                 shortName = aliases[index]
                 break
@@ -33,30 +33,29 @@ function getDisplayName(name) {
 }
 
 function removeCorpNames(name) {
-    let uname = name.replace(/\+|\/|\&|\.|-|\+| /g, '')
+    const uname = name.replace(/\+|\/|&|\.|-|\+| /g, '')
     let shortName = name
     for (const index in sortedCorpList) {
-        let suffix = new RegExp(sortedCorpList[index] + '$', 'i')
-        let prefix = new RegExp('^' + sortedCorpList[index], 'i')
+        const suffix = new RegExp(sortedCorpList[index] + '$', 'i')
+        const prefix = new RegExp('^' + sortedCorpList[index], 'i')
         if (uname.match(suffix)) {
-            let matchingSuffix = uname.match(suffix)[0]
+            const matchingSuffix = uname.match(suffix)[0]
             // match on suffixes that use spaces or other chars between letters
             // max seems to be 4 chars: m.b.H. & Co KG
-            let matchingSpacedSuffix = matchingSuffix.split('').join('\\W{0,4}')
+            const matchingSpacedSuffix = matchingSuffix.split('').join('\\W{0,4}')
             // add non-word char to regex so inc doesn't match Zinc
-            let spacedRegex = new RegExp('\\W' + matchingSpacedSuffix + '$', 'i')
+            const spacedRegex = new RegExp('\\W' + matchingSpacedSuffix + '$', 'i')
             // remove trailing punctuation, in order to check for match
-            let matchName = name.replace(/(\.|,)$/, '')
+            const matchName = name.replace(/(\.|,)$/, '')
 
             if (matchName.match(spacedRegex)) {
                 shortName = matchName.replace(spacedRegex, '')
                 break
             }
         } else if (uname.match(prefix)) {
-            let matchingPrefix = uname.match(prefix)[0]
-            let matchingSpacedPrefix = matchingPrefix.split('').join('\\W{0,1}')
-            let spacedRegex = new RegExp('^' + matchingSpacedPrefix + '\\W{0,1}\\s', 'i')
-            let matchName = name.replace(/^\./, '')
+            const matchingPrefix = uname.match(prefix)[0]
+            const matchingSpacedPrefix = matchingPrefix.split('').join('\\W{0,1}')
+            const spacedRegex = new RegExp('^' + matchingSpacedPrefix + '\\W{0,1}\\s', 'i')
 
             if (name.match(spacedRegex)) {
                 shortName = name.replace(spacedRegex, '')
@@ -67,7 +66,7 @@ function removeCorpNames(name) {
 
     // If name includes DBA, use second part of name
     if (shortName === name && name.match(/dba /gi)) {
-        let matchingDba = name.match(/dba /gi)[0]
+        const matchingDba = name.match(/dba /gi)[0]
         shortName = name.split(matchingDba)[1].replace(/\)$/, '')
     }
 
@@ -75,8 +74,8 @@ function removeCorpNames(name) {
     shortName = shortName.trim().replace(/(\.|,)$/g,'').trim().replace(/ {2,}/g, ' ')
 
     // remove quotes and parentheses when at start and end
-    if (shortName.match(/^\"/) && shortName.match(/\"$/)) {
-        shortName = shortName.replace(/^\"/, '').replace(/\"$/, '')
+    if (shortName.match(/^"/) && shortName.match(/"$/)) {
+        shortName = shortName.replace(/^"/, '').replace(/"$/, '')
     } else if (shortName.match(/^\(/) && shortName.match(/\)$/)) {
         shortName = shortName.replace(/^\(/, '').replace(/\)$/, '')
     }
@@ -90,5 +89,5 @@ function removeCorpNames(name) {
 }
 
 module.exports = {
-    getDisplayName: getDisplayName
+    getDisplayName
 }

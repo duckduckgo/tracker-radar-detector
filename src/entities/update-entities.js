@@ -16,17 +16,18 @@ const shortNames = require('./shortNames.js')
 const whoisRegexArray = whoisIgnoreList.map(regex => new RegExp(regex, 'gi'))
 const SSLRegexArray = SSLIgnoreList.map(regex => new RegExp(regex, 'gi'))
 const currentDate = new Date(Date.now()).toISOString()
+const WHOIS_XML_TOKEN = ''// credentials
 
 /**
  * Fetch x509 certificate data for domain by dropping to bash and using openSSL.
  */
 const fetchSSLData = domain => {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         // SSL requests time out for a variety of reasons, so set promise to resolve if no response in 5s
         setTimeout(() => {
             resolve('errored out')
         }, 2000)
-        exec(`echo | openssl s_client -connect ${domain}:443 -servername ${domain} | openssl x509 -noout -text`, (err, stdout, stderr) => {
+        exec(`echo | openssl s_client -connect ${domain}:443 -servername ${domain} | openssl x509 -noout -text`, (err, stdout) => {
             // If error occurs, it's probably due to either improperly set up or nonexistent SSL certificate.
             if (err) {
                 resolve('errored out')
@@ -40,12 +41,12 @@ const fetchSSLData = domain => {
  * Fetch Whois data for domain via whoisxmlapi.com, since standard unix whois is rate limited.
  */
 const fetchWhoisData = domain => {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
         request(`https://www.whoisxmlapi.com/whoisserver/WhoisService?domainName=${domain}&outputFormat=JSON&apiKey=${WHOIS_XML_TOKEN}`, (error, response, body) => {
             if (error) {
                 resolve('errored out')
             }
-            let jsonResponse = JSON.parse(body)
+            const jsonResponse = JSON.parse(body)
             if (jsonResponse.ErrorMessage) {
                 resolve('errored out')
             }
@@ -62,8 +63,8 @@ const filterSSLData = response => {
     // Depending on the length of the certificate chain, there may be multiple owner fields. We want the last one, which is most likely
     // to be the name of the actual company.
     // TODO check whois data for alt subjects on cert, add to entity if data matches
-    let sslNames = response.match(/O = .*,/g) || []
-    let sslAltNames = response.match(/DNS:.*/g) || []
+    const sslNames = response.match(/O = .*,/g) || []
+    // const sslAltNames = response.match(/DNS:.*/g) || []
     let sslCompany = sslNames[sslNames.length - 1]
     if (sslCompany) {
         // Here we want to remove the 'O = ' part of the name from the beginning of the string,
@@ -83,13 +84,13 @@ const filterSSLData = response => {
             sslCompany = decodeURIComponent(sslCompany.replace(/\\(?!")/g,'%'))
         }
         // Filter out noisy data using array of regular expressions.
-        for (let regex in SSLRegexArray) {
+        for (const regex in SSLRegexArray) {
             if (sslCompany.match(SSLRegexArray[regex])) {
                 sslCompany = ''
             }
         }
     }
-    let sslInfo = {'Company': sslCompany, 'Date': currentDate}
+    const sslInfo = {'Company': sslCompany, 'Date': currentDate}
     return sslInfo
 }
 
@@ -130,10 +131,10 @@ const filterWhoisData = response => {
     adminOrg = adminOrg.replace(/\nregister number:.*/g,'')
     techOrg = techOrg.replace(/\nregister number:.*/g,'')
     // Store date whois data was pulled
-    let whoisDate = data.audit.updatedDate
-    let whoisInfo = {'Registrant Organization': registrantOrg.trim(), 'Tech Organization': techOrg.trim(), 'Admin Organization': adminOrg.trim(), 'Date': whoisDate}
+    const whoisDate = data.audit.updatedDate
+    const whoisInfo = {'Registrant Organization': registrantOrg.trim(), 'Tech Organization': techOrg.trim(), 'Admin Organization': adminOrg.trim(), 'Date': whoisDate}
     // Filter out noisy data using array of regular expresssions.
-    for (let regex in whoisRegexArray) {
+    for (const regex in whoisRegexArray) {
         if (whoisInfo['Registrant Organization'] && whoisInfo['Registrant Organization'].match(whoisRegexArray[regex])) {
             whoisInfo['Registrant Organization'] = ''
         }
@@ -151,7 +152,7 @@ const filterWhoisData = response => {
  * Fetch and filter data from different sources for a domain.
  */
 async function fetchInfoForDomain(domain) {
-    let domainObj = {}
+    const domainObj = {}
     let sslInfo = await fetchSSLData(domain)
     if (sslInfo === 'errored out') {
         // sites often lack ssl certs for their root domain when they redirect to www, so
@@ -166,7 +167,7 @@ async function fetchInfoForDomain(domain) {
         domainObj.sslInfo = filterSSLData(sslInfo)
     }
     // Now check whois data for domain
-    let whoisInfo = await fetchWhoisData(domain)
+    const whoisInfo = await fetchWhoisData(domain)
     // If initial whois request fails, note failure and move on
     if (whoisInfo === 'errored out') {
         domainObj.whoisInfo = {'Registrant Organization': '', 'Tech Organization': '', 'Admin Organization': '', 'Date': currentDate, 'Failed': true}
@@ -183,15 +184,15 @@ const chooseName = domainObj => {
     let entity = ''
     let existingEntity = ''
     // follow hierarchy: SSL Company -> Whois Registrant Org -> Whois Admin Org -> Whois Tech Org
-    if (domainObj['sslInfo']['Company'] || domainObj['whoisInfo']['Admin Organization'] || domainObj['whoisInfo']['Registrant Organization'] || domainObj['whoisInfo']['Tech Organization']) {
-        if (domainObj['sslInfo']['Company']) {
-            entity = domainObj['sslInfo']['Company']
-        } else if (domainObj['whoisInfo']['Registrant Organization']) {
-            entity = domainObj['whoisInfo']['Registrant Organization']
-        } else if (domainObj['whoisInfo']['Admin Organization']) {
-            entity = domainObj['whoisInfo']['Admin Organization']
-        } else if (domainObj['whoisInfo']['Tech Organization']) {
-            entity = domainObj['whoisInfo']['Tech Organization']
+    if (domainObj.sslInfo.Company || domainObj.whoisInfo['Admin Organization'] || domainObj.whoisInfo['Registrant Organization'] || domainObj.whoisInfo['Tech Organization']) {
+        if (domainObj.sslInfo.Company) {
+            entity = domainObj.sslInfo.Company
+        } else if (domainObj.whoisInfo['Registrant Organization']) {
+            entity = domainObj.whoisInfo['Registrant Organization']
+        } else if (domainObj.whoisInfo['Admin Organization']) {
+            entity = domainObj.whoisInfo['Admin Organization']
+        } else if (domainObj.whoisInfo['Tech Organization']) {
+            entity = domainObj.whoisInfo['Tech Organization']
         }
         if (!entity) {return}
 
@@ -200,15 +201,15 @@ const chooseName = domainObj => {
         } else {
             // If entity not already in entity map, check if entity is in list of
             // aliases for another entity.
-            for (let entry in entityMap) {
+            for (const entry in entityMap) {
                 if (entityMap[entry].aliases.includes(entity)) {
                     existingEntity = entry
                     break
                 } else {
                     // check if slight variation of existing name exists. If it does, add variation
                     // to aliases array for existing entity
-                    let normalizedEntity = entity.toLocaleLowerCase().replace(/\s/g, '').replace(/\./g, '').replace(/,/g, '').replace(/limited$/g,'').replace(/ltd$/g,'').replace(/incorporated$/g,'').replace(/inc$/g,'').replace(/llc$/g,'').replace(/gmbh$/g,'').replace(/corporation$/g,'').replace(/corp$/g,'').trim()
-                    let normalizedEntry = entry.toLocaleLowerCase().replace(/\s/g, '').replace(/\./g, '').replace(/,/g, '').replace(/limited$/g,'').replace(/ltd$/g,'').replace(/incorporated$/g,'').replace(/inc$/g,'').replace(/llc$/g,'').replace(/gmbh$/g,'').replace(/corporation$/g,'').replace(/corp$/g,'').trim()
+                    const normalizedEntity = entity.toLocaleLowerCase().replace(/\s/g, '').replace(/\./g, '').replace(/,/g, '').replace(/limited$/g,'').replace(/ltd$/g,'').replace(/incorporated$/g,'').replace(/inc$/g,'').replace(/llc$/g,'').replace(/gmbh$/g,'').replace(/corporation$/g,'').replace(/corp$/g,'').trim()
+                    const normalizedEntry = entry.toLocaleLowerCase().replace(/\s/g, '').replace(/\./g, '').replace(/,/g, '').replace(/limited$/g,'').replace(/ltd$/g,'').replace(/incorporated$/g,'').replace(/inc$/g,'').replace(/llc$/g,'').replace(/gmbh$/g,'').replace(/corporation$/g,'').replace(/corp$/g,'').trim()
                     if (normalizedEntity === normalizedEntry) {
                         existingEntity = entry
                         break
@@ -229,7 +230,7 @@ async function checkTrackerFiles(directory) {
         if (err) {
             return
         }
-        for (let i in fileNames) {
+        for (const i in fileNames) {
             const name = fileNames[i]
             const fileContent = await readFile(directory + name)
             const domainName = fileContent.domain
@@ -240,7 +241,7 @@ async function checkTrackerFiles(directory) {
             let bestName = chooseName(domainInfo)
             console.log(name)
             if (bestName) {
-                let shortName = shortNames.getDisplayName(bestName)
+                const shortName = shortNames.getDisplayName(bestName)
                 if (!existingName) {
                     entityChanged = 1
                 } else if (existingName && existingName !== bestName) {
@@ -256,7 +257,7 @@ async function checkTrackerFiles(directory) {
 
                 // only add domains with entity changes
                 if (entityChanged === 1) {
-                    let row = `\n${domainName},${sanitizeCsvString(existingName)},${sanitizeCsvString(bestName)},${sanitizeCsvString(shortName)},0`
+                    const row = `\n${domainName},${sanitizeCsvString(existingName)},${sanitizeCsvString(bestName)},${sanitizeCsvString(shortName)},0`
                     fs.appendFileSync('./data/entityUpdates.csv', row, 'utf8')
                 }
             }
@@ -293,7 +294,12 @@ async function update(directory) {
 const readFile = fileLocation => {
     return new Promise((resolve, reject) => {
         fs.readFile(fileLocation, 'utf-8', (err, content) => {
-            let jsonContent = JSON.parse(content)
+            if (err) {
+                reject(err)
+                return
+            }
+
+            const jsonContent = JSON.parse(content)
             resolve(jsonContent)
         })
     })

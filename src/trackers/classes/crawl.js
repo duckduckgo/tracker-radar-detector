@@ -2,6 +2,7 @@ const fs = require('fs')
 const {median, std} = require('mathjs')
 const shared = require('./../helpers/sharedData.js')
 const CommonRequest = require('./commonRequest.js')
+const sharedData = require('./../helpers/sharedData.js')
 
 class Crawl {
     constructor () {
@@ -27,8 +28,10 @@ class Crawl {
 
         // Sites that are CNAME cloaked as first party.
         this.domainCloaks = {}
+
+        this.pageMap = {}
     }
-    
+
     writeSummaries () {
         _writeSummaries(this)
     }
@@ -43,6 +46,9 @@ class Crawl {
                 delete this.commonRequests[key]
                 continue
             }
+
+            this.pageMap[request.rule] = [...request.pages]
+
             request.finalize(this.stats.sites)
         }
     }
@@ -52,7 +58,7 @@ function _processSite (crawl, site) {
     // go through the uniqueDomains found on the site and update the crawl domain prevalence, fingerprinting, and cookies
     Object.keys(site.uniqueDomains).forEach(domain => {
         crawl.domainPrevalence[domain] ? crawl.domainPrevalence[domain] += 1 : crawl.domainPrevalence[domain] = 1
-        
+
         if (crawl.domainFingerprinting[domain]) {
             crawl.domainFingerprinting[domain].push(site.uniqueDomains[domain].fingerprinting)
         } else {
@@ -102,7 +108,7 @@ function _getCommonRequestKey (request) {
 
 // build a single object with domain prevalence, fingerprint, and cookie data
 function _getDomainSummaries (crawl) {
-    let domainSummary = {}
+    const domainSummary = {}
     // calculate prevalence
     Object.keys(crawl.domainPrevalence).forEach(domain => {
         domainSummary[domain] = {prevalence: 0, cookies: 0, fp: 0}
@@ -129,12 +135,12 @@ function _getEntitySummaries (crawl) {
     delete crawl.entityPrevalence.undefined
 
     // calculate the overall entity prevalence
-    for (let entity of Object.keys(crawl.entityPrevalence)) {
+    for (const entity of Object.keys(crawl.entityPrevalence)) {
         crawl.entityPrevalence[entity].total =
             +((crawl.entityPrevalence[entity].tracking + crawl.entityPrevalence[entity].nonTracking)/crawl.stats.sites).toPrecision(3)
-            
+
         crawl.entityPrevalence[entity].tracking = +(crawl.entityPrevalence[entity].tracking/crawl.stats.sites).toPrecision(3)
-         
+
         crawl.entityPrevalence[entity].nonTracking = +(crawl.entityPrevalence[entity].nonTracking/crawl.stats.sites).toPrecision(3)
     }
 
@@ -142,14 +148,17 @@ function _getEntitySummaries (crawl) {
 }
 
 function _writeSummaries (crawl) {
-
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/domain_summary.json`, JSON.stringify(_getDomainSummaries(crawl), null, 4))
 
     fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests.json`, JSON.stringify({stats: crawl.stats, requests: crawl.commonRequests}, null, 4))
 
     _getEntitySummaries(crawl)
 
-    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated//entity_prevalence.json`, JSON.stringify(crawl.entityPrevalence, null, 4))
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.json`, JSON.stringify(crawl.entityPrevalence, null, 4))
+
+    if (shared.config.includePages) {
+        fs.writeFileSync(`${sharedData.config.pageMapLoc}/pagemap.json`, JSON.stringify(crawl.pageMap, null, 4))
+    }
 
     // write entity prevalence csv
     let csv = []

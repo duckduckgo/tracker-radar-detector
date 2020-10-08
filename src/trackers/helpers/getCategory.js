@@ -11,22 +11,22 @@ function getCategories (categoryCSVfilePath) {
     const domainToCategory = categoryCSV.reduce((obj, row) => {
         
         row = parse(row)[0]
-        if (!row) return obj
+        if (!row) {return obj}
 
         const domain = row[0]
 
         // clean up category values. 1 means this is in the category, anything else no idea so skip it
-        row = row.slice(1).map(c => {
+        const rowArray = Array.from(row.slice(1)).map(c => {
             if (c === '1') {
                 return 1
-            } else if (c === '0' || c === ''){
+            } else if (c === '0' || c === '') {
                 return 0
-            } else {
-                console.log(`unknown category value for ${domain}, ${c}`)
             }
+            console.log(`unknown category value for ${domain}, ${c}`)
+            return null
         })
 
-        obj[domain] = _.object(categoryHeader, row)
+        obj[domain] = _.object(categoryHeader, rowArray)
         return obj
     }, {})
     return domainToCategory
