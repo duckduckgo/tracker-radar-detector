@@ -79,15 +79,17 @@ function _getPolicy (domain, owner={}) {
 }
 
 function _getEntity (domain) {
-    if (!domain) return {}
+    if (!domain) {
+        return {}
+    }
 
     if (sharedData.domainToEntity[domain]) {
         return sharedData.domainToEntity[domain]
-    } else {
-        const parts = domain.split('.')
-        parts.shift()
-        return _getEntity(parts.join('.'))
     }
+
+    const parts = domain.split('.')
+    parts.shift()
+    return _getEntity(parts.join('.'))
 }
 
 function _getCategories (domain) {
@@ -95,16 +97,16 @@ function _getCategories (domain) {
         return []
     }
 
-    if (sharedData.categories[domain]) {    
+    if (sharedData.categories[domain]) {
         return Object.keys(sharedData.categories[domain]).reduce((cats, key) => {
             if (sharedData.categories[domain][key]) {cats.push(key)}
             return cats
         },[])
-    } else {
-        const parts = domain.split('.')
-        parts.shift()
-        return _getCategories(parts.join('.'))
     }
+
+    const parts = domain.split('.')
+    parts.shift()
+    return _getCategories(parts.join('.'))
 }
 
 function _getPrevalence (domain) {
