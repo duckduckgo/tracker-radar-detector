@@ -22,6 +22,7 @@ class CommonRequest {
         this.fpStd = 0
         this.fpAvg = 0
         this.cnames = request.wasCNAME ? [cname.createCnameRecord(request)] : []
+        this.responseHashes = []
     }
 
     update (request, site) {
@@ -65,6 +66,11 @@ function _update (commonReq, newReq, site) {
             if (!cname.containsCnameRecord(commonReq.cnames, record)) {
                 commonReq.cnames.push(record)
             }
+        }
+
+
+        if (newReq.responseHash && !commonReq.responseHashes.includes(newReq.responseHash)) {
+            commonReq.responseHashes.push(newReq.responseHash)
         }
     }
 }

@@ -8,15 +8,13 @@ class URL {
         url = url.replace(/^blob:/, '')
         
         const tldObj = tldjs.parse(url)
-        const tldsObj = tldts.parse(url, {allowPrivateDomains: false})
+        const tldsObj = tldts.parse(url, {allowPrivateDomains: true})
 
         if (tldsObj.isIp) {
             this.domain = tldsObj.host
         } else {
             this.domain = tldsObj.domain || tldObj.domain
         }
-
-        manualCases(this)
 
         this.hostname = tldObj.hostname || tldsObj.host
         this.subdomain = tldObj.subdomain || tldsObj.subdomain
@@ -48,22 +46,6 @@ class URL {
         return urlData
     }
 
-}
-
-function manualCases (url) {
-    // regex key to correct domain value
-    const cases = {
-        ".*\\.amazonaws\\.com$": 'amazonaws.com',
-        ".*\\.cloudfront\\.net$": 'cloudfront.net',
-        ".*\\.googleapis.com$": 'googleapis.com'
-    }
-
-    for (const [re, domain] of Object.entries(cases)) {
-        if(url.domain && url.domain.match(re)) {
-            //console.log(`manual domain ${url.domain} to ${domain}`)
-            url.domain = domain
-        }
-    }
 }
 
 module.exports = URL

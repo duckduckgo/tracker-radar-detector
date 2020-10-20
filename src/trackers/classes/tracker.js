@@ -79,16 +79,34 @@ function _getPolicy (domain, owner={}) {
 }
 
 function _getEntity (domain) {
-    return sharedData.domainToEntity[domain] || {}
+    if (!domain) {
+        return {}
+    }
+
+    if (sharedData.domainToEntity[domain]) {
+        return sharedData.domainToEntity[domain]
+    }
+
+    const parts = domain.split('.')
+    parts.shift()
+    return _getEntity(parts.join('.'))
 }
 
 function _getCategories (domain) {
+    if (!domain) {
+        return []
+    }
+
     if (sharedData.categories[domain]) {
         return Object.keys(sharedData.categories[domain]).reduce((cats, key) => {
             if (sharedData.categories[domain][key]) {cats.push(key)}
             return cats
         },[])
     }
+
+    const parts = domain.split('.')
+    parts.shift()
+    return _getCategories(parts.join('.'))
 }
 
 function _getPrevalence (domain) {
@@ -130,8 +148,6 @@ function _getBreaking (domain) {
             return breaking
         }
     }
-
-    
 }
 
 module.exports = Tracker

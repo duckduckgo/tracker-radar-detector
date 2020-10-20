@@ -13,6 +13,7 @@ class Request {
         // if this request uses a third party CNAME, keep data here
         this.wasCNAME = false
         this.originalSubdomain = undefined
+        this.responseHash = reqData.responseBodyHash
     }
 
     /**
