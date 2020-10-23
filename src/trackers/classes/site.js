@@ -2,6 +2,7 @@ const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const ParsedUrl = require('./../helpers/parseUrl.js')
 const cnameHelper = require('./../helpers/cname.js')
+const getOwner = require('./../helpers/getOwner.js')
 
 class Site {
     constructor (siteData) {
@@ -23,7 +24,7 @@ class Site {
 
         this.requests = []
 
-        this.owner = shared.entityMap.get(this.domain)
+        this.owner = getOwner(this.domain)
 
         this.isFirstParty = _isFirstParty.bind(this)
 
@@ -54,10 +55,8 @@ function _getCookies (siteData) {
  * @param {string} url - url to test against.
  * @returns {bool} True if the url is in this sites first party set.
  */
-function _isFirstParty(url) {
-    const data = new ParsedUrl(url)
-    const dataOwner = shared.entityMap.get(data.domain)
-    if (data.domain === this.domain || ((dataOwner && this.owner) && dataOwner === this.owner)) {
+function _isFirstParty(request) {
+    if (request.data.domain === this.domain || ((request.owner && this.owner) && request.owner === this.owner)) {
         return true
     }
     return false
@@ -119,9 +118,8 @@ function isRootSite(request, site) {
  */
 async function _processRequest (requestData, site) {
     const request = new Request(requestData, site)
-
     // If this request is a subdomain of the site, see if it is cnamed
-    if (site.isFirstParty(request.url) &&
+    if (site.isFirstParty(request) &&
         !shared.config.treatCnameAsFirstParty &&
         !isRootSite(request, site) &&
         !cnameHelper.isSubdomainExcluded(request.data)
@@ -141,7 +139,7 @@ async function _processRequest (requestData, site) {
         }
     }
 
-    if (site.isFirstParty(request.url) && !shared.config.keepFirstParty) {
+    if (site.isFirstParty(request) && !shared.config.keepFirstParty) {
         return
     }
 

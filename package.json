@@ -30,7 +30,7 @@
     "eslint": "^6.8.0"
   },
   "scripts": {
-    "build": "./src/trackers/process-crawl.js && ./src/trackers/build-trackers.js",
+    "build": "NODE_OPTIONS=--max-old-space-size=8096 ./src/trackers/process-crawl.js && ./src/trackers/build-trackers.js",
     "process-crawl": "./src/trackers/process-crawl.js",
     "build-trackers": "./src/trackers/build-trackers.js",
     "build-performance": "./src/performance/group_data.js && ./src/performance/create_stats.js",
