@@ -24,7 +24,7 @@ class Site {
 
         this.requests = []
 
-        this.owner = getOwner(this.domain)
+        this.owner = getOwner(this.domain) 
 
         this.isFirstParty = _isFirstParty.bind(this)
 
@@ -55,8 +55,10 @@ function _getCookies (siteData) {
  * @param {string} url - url to test against.
  * @returns {bool} True if the url is in this sites first party set.
  */
-function _isFirstParty(request) {
-    if (request.data.domain === this.domain || ((request.owner && this.owner) && request.owner === this.owner)) {
+function _isFirstParty(url) {
+    const data = new ParsedUrl(url)
+    const dataOwner = getOwner(data.domain)
+    if (data.domain === this.domain || ((dataOwner && this.owner) && dataOwner === this.owner)) {
         return true
     }
     return false
@@ -119,7 +121,7 @@ function isRootSite(request, site) {
 async function _processRequest (requestData, site) {
     const request = new Request(requestData, site)
     // If this request is a subdomain of the site, see if it is cnamed
-    if (site.isFirstParty(request) &&
+    if (site.isFirstParty(request.url) &&
         !shared.config.treatCnameAsFirstParty &&
         !isRootSite(request, site) &&
         !cnameHelper.isSubdomainExcluded(request.data)
@@ -139,12 +141,13 @@ async function _processRequest (requestData, site) {
         }
     }
 
-    if (site.isFirstParty(request) && !shared.config.keepFirstParty) {
+    if (site.isFirstParty(request.url) && !shared.config.keepFirstParty) {
         return
     }
 
     site.analyzeRequest(request, site)
     site.requests.push(request)
+
 }
 
 module.exports = Site
