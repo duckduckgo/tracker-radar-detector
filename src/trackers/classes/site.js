@@ -24,7 +24,7 @@ class Site {
 
         this.requests = []
 
-        this.owner = getOwner(this.domain) 
+        this.owner = getOwner(this.domain)
 
         this.isFirstParty = _isFirstParty.bind(this)
 
@@ -147,7 +147,6 @@ async function _processRequest (requestData, site) {
 
     site.analyzeRequest(request, site)
     site.requests.push(request)
-
 }
 
 module.exports = Site
