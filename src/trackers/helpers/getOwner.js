@@ -5,8 +5,10 @@ function getOwner (domain) {
         return
     }
     
-    if (sharedData.entityMap.get(domain)) {
-        return sharedData.entityMap.get(domain)
+    const owner = sharedData.entityMap.get(domain)
+
+    if (owner) {
+        return owner
     }
 
     const parts = domain.split('.')
