@@ -1,5 +1,6 @@
 const shared = require('./../helpers/sharedData.js')
 const ParsedUrl = require('./../helpers/parseUrl.js')
+const getOwner = require('./../helpers/getOwner.js')
 
 class Request {
     constructor (reqData, site) {
@@ -26,13 +27,9 @@ class Request {
         this.domain = this.data.domain
         this.host = this.data.hostname
         this.path = this.path || this.data.path
-        this.owner = _getRequestOwner(this.data.domain)
+        this.owner = getOwner(this.data.domain)
         this.apis = this.site.siteData.data.apis.callStats[url] || {}
     }
-}
-
-function _getRequestOwner (domain) {
-    return shared.entityMap.get(domain)
 }
 
 function _getFPScore (apis) {

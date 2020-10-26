@@ -2,6 +2,7 @@ const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const ParsedUrl = require('./../helpers/parseUrl.js')
 const cnameHelper = require('./../helpers/cname.js')
+const getOwner = require('./../helpers/getOwner.js')
 
 class Site {
     constructor (siteData) {
@@ -23,7 +24,7 @@ class Site {
 
         this.requests = []
 
-        this.owner = shared.entityMap.get(this.domain)
+        this.owner = getOwner(this.domain)
 
         this.isFirstParty = _isFirstParty.bind(this)
 
@@ -56,7 +57,7 @@ function _getCookies (siteData) {
  */
 function _isFirstParty(url) {
     const data = new ParsedUrl(url)
-    const dataOwner = shared.entityMap.get(data.domain)
+    const dataOwner = getOwner(data.domain)
     if (data.domain === this.domain || ((dataOwner && this.owner) && dataOwner === this.owner)) {
         return true
     }
@@ -119,7 +120,6 @@ function isRootSite(request, site) {
  */
 async function _processRequest (requestData, site) {
     const request = new Request(requestData, site)
-
     // If this request is a subdomain of the site, see if it is cnamed
     if (site.isFirstParty(request.url) &&
         !shared.config.treatCnameAsFirstParty &&
