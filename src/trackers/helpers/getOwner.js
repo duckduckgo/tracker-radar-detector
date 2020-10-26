@@ -2,7 +2,7 @@ const sharedData = require('./sharedData.js')
 
 function getOwner (domain) {
     if (!domain) {
-        return ''
+        return
     }
     
     if (sharedData.entityMap.get(domain)) {
