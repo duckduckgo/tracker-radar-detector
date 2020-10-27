@@ -49,12 +49,16 @@ for (const key in newData.requests) {
         // add this file so we know we now have an existing entry for this tracker
         trackers[fileName] = tracker
         summary.trackers++
-        trackerPageMap[tracker.domain] = [...requestPageMap[rule.rule]]
+        if (sharedData.config.includePages) {
+            trackerPageMap[tracker.domain] = [...requestPageMap[rule.rule]]
+        }
     } else {
         log(`${chalk.blue('update tracker')} ${fileName}`)
         trackers[fileName].addRule(rule)
         trackers[fileName].addTypes(newTrackerData.type, newTrackerData.sites)
-        trackerPageMap[trackers[fileName].domain].push(...requestPageMap[rule.rule])
+        if (sharedData.config.includePages) {
+            trackerPageMap[trackers[fileName].domain].push(...requestPageMap[rule.rule])
+        }
     }
 
     if(!summary.entities.includes(trackers[fileName].owner.name)) {
