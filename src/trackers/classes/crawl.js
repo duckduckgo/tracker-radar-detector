@@ -30,6 +30,12 @@ class Crawl {
         this.domainCloaks = {}
 
         this.pageMap = {}
+
+        // for calculating api fingerprint weights
+        this.fpWeights = {
+            scripts: {tracking: 0, nontracking: 0},
+            apis: {}
+        }
     }
 
     writeSummaries () {
@@ -95,6 +101,29 @@ function _processSite (crawl, site) {
             crawl.commonRequests[key].update(request, site)
         }
     })
+
+    for (const [script, apis] of Object.entries(site.siteData.data.apis.callStats)) {
+        const apisUsed = Object.keys(apis)
+        const tracking = apisUsed.length >= 15 ? true : false
+        
+        if (tracking) {
+            crawl.fpWeights.scripts.tracking++
+        } else {
+            crawl.fpWeights.scripts.nontracking++
+        }
+
+        apisUsed.forEach(api => { 
+            if (!crawl.fpWeights.apis[api]) {
+                crawl.fpWeights.apis[api] = {tracking: 0, nontracking: 0}
+            }
+
+            if (tracking) {
+                crawl.fpWeights.apis[api].tracking++
+            } else {
+                crawl.fpWeights.apis[api].nontracking++
+            }
+        })
+    }
 }
 
 function _getCommonRequestKey (request) {
@@ -129,6 +158,35 @@ function _getDomainSummaries (crawl) {
     })
 
     return domainSummary
+}
+
+function _getFingerprintWeights (crawl) {
+    const apiWeights = {}
+    let maxWeight = 0
+    const setMaxWeight = []
+
+    for(const [api, apiScores] of Object.entries(crawl.fpWeights.apis)) {
+        const trackingWt = apiScores.tracking / crawl.fpWeights.scripts.tracking
+        const nontrackingWt = apiScores.nontracking / crawl.fpWeights.scripts.nontracking
+
+        // api is always used for tracking, set to highest weight we see
+        if (nontrackingWt === 0) {
+            setMaxWeight.push(api)
+        } else {
+            const weight = trackingWt / nontrackingWt
+            apiWeights[api] = weight
+
+            if (weight > maxWeight) {
+                maxWeight = weight
+            }
+        }
+    }
+
+    if (setMaxWeight.length) {
+        setMaxWeight.forEach(api => apiWeights[api] = maxWeight)
+    }
+
+    return apiWeights
 }
 
 function _getEntitySummaries (crawl) {
@@ -171,6 +229,8 @@ function _writeSummaries (crawl) {
 
     csv = csv.sort((a, b) => b[1] - a[1])
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.csv`, csv.reduce((str, row) => {str += `"${row[0]}",${row[1]},${row[2]},${row[3]}\n`; return str}, 'Entity,Total Prevalence,Tracking Prevalence,Non-tracking Prevalence\n'))
+
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/api_fingerprint_weights.json`, JSON.stringify(_getFingerprintWeights(crawl), null, 4))
 }
 
 function updateEntityPrevalence (crawl) {
