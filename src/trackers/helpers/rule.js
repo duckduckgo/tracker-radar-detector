@@ -1,4 +1,5 @@
 const sharedData = require('./sharedData.js')
+const tldts = require('tldts')
 
 // Adds example sites for each rule if enabled in the config file
 // Half of the sites can be chosen from a top sites list provided in the config. 
@@ -30,7 +31,7 @@ function getExampleSites (sites, limit) {
 // get unique random indicies from the source list
 function _getRandomIndex (sourceList, indexList) {
     const idx = Math.floor(Math.random() * sourceList.length)
-    if (indexList.includes(idx)) {
+    if (indexList.includes(idx) && !tldts.parse(`http://${sourceList[idx]}`).isIp) {
         return _getRandomIndex(sourceList, indexList)
     }
     return idx

@@ -14,7 +14,7 @@ class SharedData {
         this.policies = _getJSON(`${build}/static/privacy_policies.json`)
         this.surrogates = _getJSON(`${build}/static/surrogates.json`)
         this.domains = _getJSON(`${build}/generated/domain_summary.json`) || {}
-        this.abuseScores = _getJSON(`${build}/static/api_fingerprint_weights.json`)
+        this.abuseScores = _getJSON(`${build}/generated/api_fingerprint_weights.json`)
         this.categories = _getCategories()
         this.domainToEntity = _readEntities()
         this.entityMap = entityHelper.entityMap(`${cfg.trackerDataLoc}/entities`)
