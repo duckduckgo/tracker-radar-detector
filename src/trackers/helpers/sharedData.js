@@ -35,7 +35,7 @@ function _readEntities () {
 }
 
 // option list of top example sites to include in tracker files
-function _getTopExampleSites (config) {
+function _getTopExampleSites () {
     if (!config.topExampleSites) {
         return null
     }

@@ -102,9 +102,13 @@ function _processSite (crawl, site) {
         }
     })
 
-    for (const [script, apis] of Object.entries(site.siteData.data.apis.callStats)) {
+    for (const apis of Object.values(site.siteData.data.apis.callStats)) {
         const apisUsed = Object.keys(apis)
-        const tracking = apisUsed.length >= 15 ? true : false
+        
+        let tracking = false
+        if (apisUsed.length >= 15) {
+            tracking = true
+        }
         
         if (tracking) {
             crawl.fpWeights.scripts.tracking++
@@ -112,7 +116,7 @@ function _processSite (crawl, site) {
             crawl.fpWeights.scripts.nontracking++
         }
 
-        apisUsed.forEach(api => { 
+        apisUsed.forEach(api => {
             if (!crawl.fpWeights.apis[api]) {
                 crawl.fpWeights.apis[api] = {tracking: 0, nontracking: 0}
             }
@@ -183,7 +187,9 @@ function _getFingerprintWeights (crawl) {
     }
 
     if (setMaxWeight.length) {
-        setMaxWeight.forEach(api => apiWeights[api] = maxWeight)
+        setMaxWeight.forEach(api => {
+            apiWeights[api] = maxWeight
+        })
     }
 
     return apiWeights
