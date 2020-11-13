@@ -1,7 +1,7 @@
 const tldjs = require('tldjs')
 const performanceHelper = require('./../helpers/getPerformance.js')
 const sharedData = require('./../helpers/sharedData.js')
-const getFpRank = require('./../helpers/getFingerprintRank.js')
+const {getFingerprintRank} = require('./../helpers/fingerprints.js')
 const cname = require('./../helpers/cname.js')
 
 class Tracker {
@@ -17,12 +17,11 @@ class Tracker {
         this.subdomains = []
         this.cnames = []
 
-        this.fingerprinting = getFpRank(sharedData.domains[this.domain].fp || 0)
+        this.fingerprinting = getFingerprintRank(sharedData.domains[this.domain].fp || 0)
         this.resources = []
         this.categories = _getCategories(this.domain) || []
         this.performance = performanceHelper.getPerformance(this.domain, sharedData.config.performanceDataLoc) || {}
         this.cookies = +(_getCookies(this.domain).toPrecision(3))
-
 
         const policy = _getPolicy(this.domain, this.owner)
         

@@ -1,4 +1,4 @@
-const getFpRank = require('./../helpers/getFingerprintRank.js')
+const {getFingerprintRank} = require('./../helpers/fingerprints.js')
 const sharedData = require('./../helpers/sharedData.js')
 const ruleHelper = require('./../helpers/rule.js')
 
@@ -6,7 +6,7 @@ class Rule {
     constructor (newRuleData, totalSites) {
         this.rule = newRuleData.rule
         this.cookies = +newRuleData.cookies.toPrecision(3)
-        this.fingerprinting = getFpRank(newRuleData.fpAvg + newRuleData.fpStd)
+        this.fingerprinting = getFingerprintRank(newRuleData.fpAvg + newRuleData.fpStd)
         this.foundOn = newRuleData.foundOn
         this.subdomains = newRuleData.subdomains
         this.apis = newRuleData.apis
