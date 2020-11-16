@@ -31,7 +31,7 @@ function getFingerprintWeights (crawl) {
         if (nontrackingWt === 0) {
             setMaxWeight.push(api)
         } else {
-            const weight = trackingWt / nontrackingWt
+            const weight = (trackingWt / nontrackingWt).toFixed(2)
             apiWeights[api] = weight
 
             if (weight > maxWeight) {
