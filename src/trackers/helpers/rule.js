@@ -5,6 +5,15 @@ const tldts = require('tldts')
 // Half of the sites can be chosen from a top sites list provided in the config. 
 // The other half are randomly chosen form the list of sites a request was found on
 function getExampleSites (sites, limit) {
+    // remove IPs from example site list, if any
+    sites = sites.filter(site => {
+        if (!site) {
+            return false
+        }
+        const parsedSite = tldts.parse(site)
+        return !parsedSite.isIp
+    })
+
     if (sites.length <= limit) {
         return sites
     }
@@ -31,7 +40,9 @@ function getExampleSites (sites, limit) {
 // get unique random indicies from the source list
 function _getRandomIndex (sourceList, indexList) {
     const idx = Math.floor(Math.random() * sourceList.length)
-    if (indexList.includes(idx) && !tldts.parse(`http://${sourceList[idx]}`).isIp) {
+
+    // skip sites already in the example list, or IPs
+    if (indexList.includes(idx)) {
         return _getRandomIndex(sourceList, indexList)
     }
     return idx
