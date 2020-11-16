@@ -14,7 +14,8 @@ class Rule {
         this.prevalence = +(newRuleData.sites / totalSites).toPrecision(3)
         this.cnames = newRuleData.cnames
         this.responseHashes = newRuleData.responseHashes
-        
+        this.type = newRuleData.type
+
         if (sharedData.config.includeExampleSites) {
             this.exampleSites = ruleHelper.getExampleSites(newRuleData.pages, sharedData.config.includeExampleSites)
         }
