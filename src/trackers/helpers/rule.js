@@ -22,8 +22,10 @@ function getExampleSites (sites, limit) {
 
     // half of the list is topExampleSites if given
     if (sharedData.topExampleSitesSet) {
-        const intersection = sites.filter(x => sharedData.topExampleSitesSet.has(x))
-        intersection.slice(0, Math.floor(limit/2)).map(domain => idxList.push(sites.indexOf(domain)))
+        sites
+            .filter(x => sharedData.topExampleSitesSet.has(x))
+            .slice(0, Math.floor(limit/2))
+            .forEach(domain => idxList.push(sites.indexOf(domain)))
     }
 
     const sitesToAdd = limit - idxList.length
