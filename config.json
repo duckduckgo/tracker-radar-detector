@@ -6,6 +6,13 @@
     "flags": {
         "addSurrogates": false
     },
+    "keepFirstParty": false,
+    "treatCnameAsFirstParty": false,
+    "parallelism": 100,
+    "verbose": false,
+    "cname_ignore_subdomains": ["", "www"],
+    "includePages": true,
+    "pageMapLoc": "path to store page maps"
     "topExampleSites": "JSON list of top sites to include as example sites",
     "includeExampleSites": "number of example sites to include for each resource"
 }
