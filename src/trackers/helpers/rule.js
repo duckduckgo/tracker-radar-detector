@@ -43,7 +43,7 @@ function getExampleSites (sites, limit) {
 function _getRandomIndex (sourceList, indexList) {
     const idx = Math.floor(Math.random() * sourceList.length)
 
-    // skip sites already in the example list, or IPs
+    // skip sites already in the example list
     if (indexList.includes(idx)) {
         return _getRandomIndex(sourceList, indexList)
     }
