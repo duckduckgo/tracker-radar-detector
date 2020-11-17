@@ -99,8 +99,8 @@ function _finalize (request, totalSites) {
     request.fpStd = Math.sqrt(sumSquare / (request.fpPerSite.length - 1)) || 0
 
     delete request.fpPerSite
-    delete request.pages
-
+    
+    request.pages = [...request.pages]
     request.subdomains = [...request.subdomains]
 }
 

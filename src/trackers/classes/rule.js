@@ -1,10 +1,12 @@
-const getFpRank = require('./../helpers/getFingerprintRank.js')
+const {getFingerprintRank} = require('./../helpers/fingerprints.js')
+const sharedData = require('./../helpers/sharedData.js')
+const ruleHelper = require('./../helpers/rule.js')
 
 class Rule {
     constructor (newRuleData, totalSites) {
         this.rule = newRuleData.rule
         this.cookies = +newRuleData.cookies.toPrecision(3)
-        this.fingerprinting = getFpRank(newRuleData.fpAvg + newRuleData.fpStd)
+        this.fingerprinting = getFingerprintRank(newRuleData.fpAvg + newRuleData.fpStd)
         this.foundOn = newRuleData.foundOn
         this.subdomains = newRuleData.subdomains
         this.apis = newRuleData.apis
@@ -12,6 +14,11 @@ class Rule {
         this.prevalence = +(newRuleData.sites / totalSites).toPrecision(3)
         this.cnames = newRuleData.cnames
         this.responseHashes = newRuleData.responseHashes
+        this.type = newRuleData.type
+
+        if (sharedData.config.includeExampleSites) {
+            this.exampleSites = ruleHelper.getExampleSites(newRuleData.pages, sharedData.config.includeExampleSites)
+        }
     }
 }
 

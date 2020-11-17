@@ -14,11 +14,12 @@ class SharedData {
         this.policies = _getJSON(`${build}/static/privacy_policies.json`)
         this.surrogates = _getJSON(`${build}/static/surrogates.json`)
         this.domains = _getJSON(`${build}/generated/domain_summary.json`) || {}
-        this.abuseScores = _getJSON(`${build}/static/api_fingerprint_weights.json`)
+        this.abuseScores = _getJSON(`${build}/generated/api_fingerprint_weights.json`)
         this.categories = _getCategories()
         this.domainToEntity = _readEntities()
         this.entityMap = entityHelper.entityMap(`${cfg.trackerDataLoc}/entities`)
         this.breaking = _getBreaking(`${build}/static/breaking`)
+        this.topExampleSitesSet = _getTopExampleSites(cfg)
     }
 }
 
@@ -31,6 +32,14 @@ function _readEntities () {
         })
         return domainList
     }, {})
+}
+
+// option list of top example sites to include in tracker files
+function _getTopExampleSites () {
+    if (!config.topExampleSites) {
+        return null
+    }
+    return new Set(JSON.parse(fs.readFileSync(config.topExampleSites, 'utf8')))
 }
 
 // read tracker category data from csv and return object

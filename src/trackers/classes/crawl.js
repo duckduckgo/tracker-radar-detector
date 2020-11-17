@@ -3,6 +3,9 @@ const {median, std} = require('mathjs')
 const shared = require('./../helpers/sharedData.js')
 const CommonRequest = require('./commonRequest.js')
 const sharedData = require('./../helpers/sharedData.js')
+const {getFingerprintWeights} = require('./../helpers/fingerprints.js')
+
+const API_COUNT_THRESHOLD = 15
 
 class Crawl {
     constructor () {
@@ -30,6 +33,12 @@ class Crawl {
         this.domainCloaks = {}
 
         this.pageMap = {}
+
+        // for calculating api fingerprint weights
+        this.fpWeights = {
+            scripts: {tracking: 0, nontracking: 0},
+            apis: {}
+        }
     }
 
     writeSummaries () {
@@ -95,6 +104,33 @@ function _processSite (crawl, site) {
             crawl.commonRequests[key].update(request, site)
         }
     })
+
+    for (const apis of Object.values(site.siteData.data.apis.callStats)) {
+        const apisUsed = Object.keys(apis)
+        
+        let tracking = false
+        if (apisUsed.length >= API_COUNT_THRESHOLD) {
+            tracking = true
+        }
+        
+        if (tracking) {
+            crawl.fpWeights.scripts.tracking++
+        } else {
+            crawl.fpWeights.scripts.nontracking++
+        }
+
+        apisUsed.forEach(api => {
+            if (!crawl.fpWeights.apis[api]) {
+                crawl.fpWeights.apis[api] = {tracking: 0, nontracking: 0}
+            }
+
+            if (tracking) {
+                crawl.fpWeights.apis[api].tracking++
+            } else {
+                crawl.fpWeights.apis[api].nontracking++
+            }
+        })
+    }
 }
 
 function _getCommonRequestKey (request) {
@@ -171,6 +207,8 @@ function _writeSummaries (crawl) {
 
     csv = csv.sort((a, b) => b[1] - a[1])
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.csv`, csv.reduce((str, row) => {str += `"${row[0]}",${row[1]},${row[2]},${row[3]}\n`; return str}, 'Entity,Total Prevalence,Tracking Prevalence,Non-tracking Prevalence\n'))
+
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/api_fingerprint_weights.json`, JSON.stringify(getFingerprintWeights(crawl), null, 4))
 }
 
 function updateEntityPrevalence (crawl) {
