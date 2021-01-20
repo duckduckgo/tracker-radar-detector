@@ -1,5 +1,5 @@
 /**
- * Handle nameserver lookups
+ * Handle name server lookups
  */
 const dns = require('dns').promises
 const shared = require('./sharedData.js')
@@ -10,9 +10,9 @@ const cache = {}
 class NameServers {
     /**
      * Attempt to look name servers for a given hostname
-     * @param {string} url - url to run the check on.
+     * @param {string} host - hostname to look up.
      *
-     * @return {Promise} The name server resolution
+     * @return {array} The name server resolution
      */
     static async resolveNs(host) {
         if (!host) {
@@ -22,9 +22,14 @@ class NameServers {
         if (host in cache) {
             return await cache[host]
         }
-        
-        // New NS request, add promise to cache to avoid multiple requests for this host
+       
+        // New DNS NS request
+        // Sites are processed in batches. It's possible for multiple NS requests to 
+        // happen before the cache has a resolved NS response. Handle this by adding the unresolved 
+        // promise to the cache so multiple requests for the same host can reference the 
+        // same cache entry
         cache[host] = dns.resolveNs(host).catch(e => _handleNsError(e, host, cache))
+        
         cache[host] = await cache[host]
 
         return cache[host]
