@@ -5,6 +5,8 @@ const config = require('./../../../config.json')
 const categoryHelper = require(`./getCategory.js`)
 const entityHelper = require('./getEntityMap.js')
 const ParsedUrl = require('./parseUrl.js')
+const NameServers = require('./nameserver.js')
+
 class SharedData {
     constructor (cfg) {
         console.log(chalk.green("Reading static data"))
@@ -20,6 +22,7 @@ class SharedData {
         this.entityMap = entityHelper.entityMap(`${cfg.trackerDataLoc}/entities`)
         this.breaking = _getBreaking(`${build}/static/breaking`)
         this.topExampleSitesSet = _getTopExampleSites(cfg)
+        this.nameservers = NameServers
     }
 }
 

@@ -15,9 +15,10 @@ class Rule {
         this.cnames = newRuleData.cnames
         this.responseHashes = newRuleData.responseHashes
         this.type = newRuleData.type
+        this.nameservers = newRuleData.nameservers
 
         if (sharedData.config.includeExampleSites) {
-            this.exampleSites = ruleHelper.getExampleSites(newRuleData.pages, sharedData.config.includeExampleSites)
+            this.exampleSites = newRuleData.exampleSites
         }
     }
 }
