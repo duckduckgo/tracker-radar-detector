@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 const chalk = require('chalk')
-const fs = require('fs')
 const Progress = require('progress')
 
 const sharedData = require('./helpers/sharedData.js')
 const crawl = require('./classes/crawl.js')
 const Site = require('./classes/site.js')
 
-const { JSONFileDataReader } = require('./helpers/readers');
+const {JSONFileDataReader, PostgresDataReader} = require('./helpers/readers')
 
 console.log(`Reading crawl from: ${sharedData.config.crawlerDataLoc}`)
-let bar;
+let bar
 
 // Process a single site crawler file. This will look through each request in the file
 // and update the corresponding entry in the global commonRequests object with new data
@@ -38,24 +37,29 @@ async function processSite(siteData) {
 }
 
 async function processCrawl() {
-    const reader = new JSONFileDataReader(sharedData.config.crawlerDataLoc);
+    const reader = sharedData.config.crawlerDataLoc === 'postgres'
+        ? new PostgresDataReader(sharedData.config.crawlId, sharedData.config.region)
+        : new JSONFileDataReader(sharedData.config.crawlerDataLoc)
     console.time("runtime")
-    bar = new Progress('Process crawl [:bar] :percent', {width: 40, total: await reader.length()})
+    try {
+        bar = new Progress('Process crawl [:bar] :percent', {width: 40, total: await reader.length()})
 
-    let sites = []
-    for await (const siteData of reader.iterator()) {
-        if (sites.length >= sharedData.config.parallelism) {
-            await Promise.allSettled(sites)
-            sites = [];
-            continue;
+        let sites = []
+        for await (const siteData of reader.iterator()) {
+            if (sites.length >= 100) {
+                await Promise.allSettled(sites)
+                sites = []
+            }
+            sites.push(processSite(siteData))
         }
-        sites.push(processSite(siteData))
+        await Promise.allSettled(sites)
+        crawl.finalizeRequests()
+        crawl.writeSummaries()
+        console.log(`${chalk.blue(crawl.stats.sites)} sites processed\n${chalk.blue(crawl.stats.requests)} requests processed\n${chalk.blue(crawl.stats.requestsSkipped)} requests skipped`)
+    } finally {
+        console.timeEnd("runtime")
+        reader.close()
     }
-    await Promise.allSettled(sites)
-    crawl.finalizeRequests()
-    crawl.writeSummaries()
-    console.log(`${chalk.blue(crawl.stats.sites)} sites processed\n${chalk.blue(crawl.stats.requests)} requests processed\n${chalk.blue(crawl.stats.requestsSkipped)} requests skipped`)
-    console.timeEnd("runtime")
 }
 
 /// process the sites and write summary files
