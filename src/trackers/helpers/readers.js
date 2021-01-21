@@ -1,7 +1,10 @@
 const fs = require('fs')
+const {gunzip} = require('zlib')
 const {Client} = require('pg')
 const Cursor = require('pg-cursor')
 const {promisify} = require('util')
+
+const dogunzip = promisify(gunzip)
 
 class JSONFileDataReader {
     constructor(path) {
@@ -22,7 +25,11 @@ class JSONFileDataReader {
 
     async *iterator() {
         for (const file of await this.getFileList()) {
-            const siteData = JSON.parse(await fs.promises.readFile(`${this.path}/${file}`, 'utf8'))
+            // transparently expand gzipped files
+            const fileData = file.endsWith('.gz')
+                ? (await dogunzip(await fs.promises.readFile(`${this.path}/${file}`))).toString('utf-8')
+                : fs.promises.readFile(`${this.path}/${file}`, 'utf8')
+            const siteData = JSON.parse(fileData)
             if (siteData.initialUrl) {
                 yield siteData
             }
