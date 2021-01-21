@@ -42,7 +42,7 @@ class Site {
 // Cookie data from the crawler has the domain and path split
 // we will parse and combine those parts to get a single domain
 function _getCookies (siteData) {
-    return  siteData.data.cookies.reduce((cookieObj, cookie) => {
+    return (siteData.data.cookies || []).reduce((cookieObj, cookie) => {
        // some domains will have a leading period we need to remove
         const cookieHost = new ParsedUrl(`http://${cookie.domain.replace(/^\./,'')}`).hostname
         cookieObj[`${cookieHost}${cookie.path}`]
