@@ -38,7 +38,7 @@ async function processSite(siteData) {
 
 async function processCrawl() {
     const reader = sharedData.config.crawlerDataLoc === 'postgres'
-        ? new PostgresDataReader(sharedData.config.crawlId, sharedData.config.region)
+        ? new PostgresDataReader(sharedData.config.crawlId, sharedData.config.regionCode)
         : new JSONFileDataReader(sharedData.config.crawlerDataLoc)
     console.time("runtime")
     try {
@@ -46,7 +46,8 @@ async function processCrawl() {
 
         let sites = []
         for await (const siteData of reader.iterator()) {
-            if (sites.length >= 100) {
+            if (sites.length >= sharedData.config.parallelism) {
+                // wait for batch to finish before reading more site data
                 await Promise.allSettled(sites)
                 sites = []
             }
