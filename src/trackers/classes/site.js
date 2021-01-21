@@ -122,7 +122,8 @@ async function _processRequest (requestData, site) {
     const request = new Request(requestData, site)
 
     if (!site.isFirstParty(request.url)) {
-        const nameservers = await shared.nameservers.resolveNs(request.host)
+        const nameservers = await shared.nameservers.resolveNs(request.domain)
+
         if (nameservers) {
             request.nameservers = nameservers
         }

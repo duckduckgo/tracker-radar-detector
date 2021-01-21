@@ -1,5 +1,5 @@
 const cname = require('./../helpers/cname.js')
-const {getExampleSites} = require('./../helpers/rule.js')
+const {getExampleSites} = require('./../helpers/getExampleSites.js')
 const sharedData = require('./../helpers/sharedData.js')
 
 class CommonRequest {

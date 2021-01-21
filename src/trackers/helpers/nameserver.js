@@ -2,8 +2,6 @@
  * Handle name server lookups
  */
 const dns = require('dns').promises
-const shared = require('./sharedData.js')
-const ParsedUrl = require('./parseUrl.js')
 const fs = require('fs')
 const cache = {}
 
@@ -20,7 +18,7 @@ class NameServers {
         }
 
         if (host in cache) {
-            return await cache[host]
+            return cache[host]
         }
        
         // New DNS NS request
@@ -28,8 +26,7 @@ class NameServers {
         // happen before the cache has a resolved NS response. Handle this by adding the unresolved 
         // promise to the cache so multiple requests for the same host can reference the 
         // same cache entry
-        cache[host] = dns.resolveNs(host).catch(e => _handleNsError(e, host, cache))
-        
+        cache[host] = dns.resolveNs(host).catch(e => _handleNsError(e, host))
         cache[host] = await cache[host]
 
         return cache[host]
@@ -43,7 +40,7 @@ class NameServers {
 }
 
 // Set cache result to empty list for no NS result
-function _handleNsError (e, host, cache) {
+function _handleNsError (e, host) {
     if (e.message && (e.message.includes("ENODATA") || e.message.includes("ENOTFOUND"))) {
         if (!Array.isArray(cache[host])) {
             cache[host] = []

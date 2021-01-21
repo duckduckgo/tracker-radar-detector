@@ -1,6 +1,5 @@
 const {getFingerprintRank} = require('./../helpers/fingerprints.js')
 const sharedData = require('./../helpers/sharedData.js')
-const ruleHelper = require('./../helpers/rule.js')
 
 class Rule {
     constructor (newRuleData, totalSites) {

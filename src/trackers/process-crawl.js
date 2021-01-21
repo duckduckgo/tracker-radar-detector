@@ -55,6 +55,8 @@ async function processCrawl(fileList) {
     crawl.writeSummaries()
     console.log(`${chalk.blue(crawl.stats.sites)} sites processed\n${chalk.blue(crawl.stats.requests)} requests processed\n${chalk.blue(crawl.stats.requestsSkipped)} requests skipped`)
     console.timeEnd("runtime")
+
+    sharedData.nameservers.saveCache()
 }
 
 /// process the sites and write summary files
