@@ -27,7 +27,6 @@ class NameServers {
         // promise to the cache so multiple requests for the same host can reference the 
         // same cache entry
         cache[host] = dns.resolveNs(host).catch(e => _handleNsError(e, host))
-        cache[host] = await cache[host]
 
         return cache[host]
     }
