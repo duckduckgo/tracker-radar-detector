@@ -42,11 +42,14 @@ Note that if you wish to resolve CNAME's, node version 12+ is required. You can 
 
 ### Postgresql data source
 
-Crawler data can also be read from a PostgreSQL database. Simply set the `crawlerDataLoc` to `postgres`, and set the `crawlId` and `region` options. Database details should be provided via environment variables, for example with `envdir`:
+Crawler data can also be read from a PostgreSQL database. To enable this, set the `crawlerDataLoc` to `postgres`, and set the `crawlId` and `region` options in `config.json`.
+Database details should be provided via environment variables, for example with `envdir`:
 
 ```
 envdir /etc/ddg/dbenv/tracker_radar_readonly/ npm run build
 ```
+
+See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
 
 ## Contributing
 
