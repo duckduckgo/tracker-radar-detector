@@ -79,7 +79,7 @@ class PostgresDataReader {
                 // fix for quoted urls
                 if (row.initialUrl.trim().startsWith('"')) {
                     row.initialUrl = row.initialUrl.substring(1, row.initialUrl.length - 1)
-                    row.finalUrl = row.finalUrl.substring(1, row.initialUrl.length - 1)
+                    row.finalUrl = row.finalUrl.substring(1, row.finalUrl.length - 1)
                 }
                 // cast timestamps to int
                 row.started = parseInt(row.started, 10)
