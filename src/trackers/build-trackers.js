@@ -65,7 +65,7 @@ for (const key in newData.requests) {
         }
     }
 
-    if(!summary.entities.includes(trackers[fileName].owner.name)) {
+    if (!summary.entities.includes(trackers[fileName].owner.name)) {
         summary.entities.push(trackers[fileName].owner.name)
     }
 

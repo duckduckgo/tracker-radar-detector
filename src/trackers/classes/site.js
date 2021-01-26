@@ -43,7 +43,7 @@ class Site {
 // we will parse and combine those parts to get a single domain
 function _getCookies (siteData) {
     return (siteData.data.cookies || []).reduce((cookieObj, cookie) => {
-       // some domains will have a leading period we need to remove
+        // some domains will have a leading period we need to remove
         const cookieHost = new ParsedUrl(`http://${cookie.domain.replace(/^\./,'')}`).hostname
         cookieObj[`${cookieHost}${cookie.path}`]
         return cookieObj
@@ -75,7 +75,7 @@ function _analyzeRequest(request, site) {
     }
 
     // The entities found on a site are either tracking or not tracking, e.g., a single tracking request sets the entity as a tracker
-    if(request.owner && typeof site.uniqueEntities[request.owner] !== 'undefined') {
+    if (request.owner && typeof site.uniqueEntities[request.owner] !== 'undefined') {
         if (request.isTracking && site.uniqueEntities[request.owner].tracking === false) {
             site.uniqueEntities[request.owner].tracking = true
         }
@@ -120,14 +120,23 @@ function isRootSite(request, site) {
  */
 async function _processRequest (requestData, site) {
     const request = new Request(requestData, site)
+
+    if (!site.isFirstParty(request.url)) {
+        const nameservers = await shared.nameservers.resolveNs(request.domain)
+
+        if (nameservers) {
+            request.nameservers = nameservers
+        }
+    }
+
     // If this request is a subdomain of the site, see if it is cnamed
     if (site.isFirstParty(request.url) &&
         !shared.config.treatCnameAsFirstParty &&
         !isRootSite(request, site) &&
         !cnameHelper.isSubdomainExcluded(request.data)
-        ) {
+    ) {
         const cnames = await cnameHelper.resolveCname(request.url)
-        if(cnames) {
+        if (cnames) {
             for (const cname of cnames) {
                 if (!site.isFirstParty(cname)) {
                     // console.log(`Third Party CNAME: ${request.data.subdomain}.${request.data.domain} -> ${cname}`)
@@ -140,6 +149,7 @@ async function _processRequest (requestData, site) {
             }
         }
     }
+   
 
     if (site.isFirstParty(request.url) && !shared.config.keepFirstParty) {
         return

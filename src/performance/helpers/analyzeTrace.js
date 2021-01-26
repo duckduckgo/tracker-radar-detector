@@ -48,30 +48,29 @@ async function analyzeTrace(trace, requests) {
 
     let hadExcessiveChromeExtension = false
     const results = Array.from(executionTimings)
-    .map(([url, timingByGroupId]) => {
-        // Add up the totalExecutionTime for all the taskGroups
-        let totalExecutionTimeForURL = 0
-        for (const [groupId, timespanMs] of Object.entries(timingByGroupId)) {
-            timingByGroupId[groupId] = timespanMs
-            totalExecutionTimeForURL += timespanMs
-        }
+        .map(([url, timingByGroupId]) => {
+            // Add up the totalExecutionTime for all the taskGroups
+            let totalExecutionTimeForURL = 0
+            for (const [groupId, timespanMs] of Object.entries(timingByGroupId)) {
+                timingByGroupId[groupId] = timespanMs
+                totalExecutionTimeForURL += timespanMs
+            }
 
-        const scriptingTotal = timingByGroupId[taskGroups.scriptEvaluation.id] || 0
-        const parseCompileTotal = timingByGroupId[taskGroups.scriptParseCompile.id] || 0
+            const scriptingTotal = timingByGroupId[taskGroups.scriptEvaluation.id] || 0
+            const parseCompileTotal = timingByGroupId[taskGroups.scriptParseCompile.id] || 0
 
-        hadExcessiveChromeExtension = hadExcessiveChromeExtension ||
-        (url.startsWith('chrome-extension:') && scriptingTotal > 100)
+            hadExcessiveChromeExtension = hadExcessiveChromeExtension || (url.startsWith('chrome-extension:') && scriptingTotal > 100)
 
-        return {
-            url,
-            total: totalExecutionTimeForURL,
-            // Highlight the JavaScript task costs
-            scripting: scriptingTotal,
-            scriptParseCompile: parseCompileTotal,
-        }
-    })
-    .filter(result => result.total >= thresholdInMs)
-    .sort((a, b) => b.total - a.total)
+            return {
+                url,
+                total: totalExecutionTimeForURL,
+                // Highlight the JavaScript task costs
+                scripting: scriptingTotal,
+                scriptParseCompile: parseCompileTotal,
+            }
+        })
+        .filter(result => result.total >= thresholdInMs)
+        .sort((a, b) => b.total - a.total)
 
     return results
 }

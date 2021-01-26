@@ -1,4 +1,6 @@
 const cname = require('./../helpers/cname.js')
+const {getExampleSites} = require('./../helpers/getExampleSites.js')
+const sharedData = require('./../helpers/sharedData.js')
 
 class CommonRequest {
     constructor (request, site) {
@@ -23,6 +25,8 @@ class CommonRequest {
         this.fpAvg = 0
         this.cnames = request.wasCNAME ? [cname.createCnameRecord(request)] : []
         this.responseHashes = []
+
+        this.nameservers = request.nameservers
     }
 
     update (request, site) {
@@ -50,7 +54,7 @@ function _update (commonReq, newReq, site) {
         commonReq.sites++
         commonReq.apis = _combineApis(commonReq.apis, newReq.apis)
 
-        if(newReq.data.subdomain) {
+        if (newReq.data.subdomain) {
             commonReq.subdomains.add(newReq.data.subdomain)
         }
 
@@ -99,8 +103,10 @@ function _finalize (request, totalSites) {
     request.fpStd = Math.sqrt(sumSquare / (request.fpPerSite.length - 1)) || 0
 
     delete request.fpPerSite
+
+    request.exampleSites = getExampleSites([...request.pages], sharedData.config.includeExampleSites)
+    delete request.pages
     
-    request.pages = [...request.pages]
     request.subdomains = [...request.subdomains]
 }
 

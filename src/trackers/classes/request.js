@@ -15,6 +15,7 @@ class Request {
         this.wasCNAME = false
         this.originalSubdomain = undefined
         this.responseHash = reqData.responseBodyHash
+        this.nameservers = []
     }
 
     /**
