@@ -42,6 +42,8 @@ describe('Tracker', () => {
     let rule
 
     before(() => {
+        // Disable include example sites
+        sharedData.config.includeExampleSites = false
         // TODO - this domain summary data should be explicitly provided rather than loaded by sharedData.
         sharedData.domains['tracker.com'] = {
             prevalence: 0.01,

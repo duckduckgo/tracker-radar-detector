@@ -3,6 +3,7 @@ const {describe, it, before} = require('mocha')
 
 const Site = require('../src/trackers/classes/site')
 const crawl = require('../src/trackers/classes/crawl.js')
+const sharedData = require('../src/trackers/helpers/sharedData')
 
 const mockSiteData = require('./fixtures/example.com.json')
 
@@ -21,6 +22,8 @@ describe('Process Crawl', () => {
     ]
     
     before(async () => {
+        // Mock owner of 3rd party domains
+        sharedData.entityMap.set('google-analytics.com', 'Google LLC')
         site = new Site(mockSiteData)
         for (const request of mockSiteData.data.requests) {
             await site.processRequest(request)
