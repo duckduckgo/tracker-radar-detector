@@ -59,7 +59,7 @@ class Tracker {
         })
         this.cnames.sort((a,b) => a.original.localeCompare(b.original))
 
-        if(rule.nameservers && rule.nameservers.length) {
+        if (rule.nameservers && rule.nameservers.length) {
             this.nameservers = [...new Set(this.nameservers.concat(rule.nameservers))]
         }
         
