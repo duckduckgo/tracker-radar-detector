@@ -1,0 +1,239 @@
+{
+  "initialUrl": "http://test.example.com/",
+  "finalUrl": "https://test.example.com/test/",
+  "rank": 1731,
+  "timeout": false,
+  "testStarted": 1607969476676,
+  "testFinished": 1607969483989,
+  "data": {
+    "apis": {
+      "callStats": {
+        "https://www.google-analytics.com/analytics.js": {
+          "Screen.prototype.width": 1,
+          "Screen.prototype.height": 1,
+          "Screen.prototype.colorDepth": 1,
+          "Navigator.prototype.plugins": 1,
+          "Navigator.prototype.javaEnabled": 1,
+          "Navigator.prototype.language": 1,
+          "Date.prototype.getTime": 14,
+          "Navigator.prototype.userAgent": 2,
+          "Document.cookie setter": 1
+        }
+      },
+      "savedCalls": [
+        {
+          "source": "https://www.google-analytics.com/analytics.js",
+          "description": "Document.cookie setter",
+          "arguments": [
+            "_ga=GA1.2.2073038129.1608010879; path=/; expires=Thu, 15 Dec 2022 05:41:27 GMT; domain=example.com;"
+          ]
+        }
+      ]
+    },
+    "cookies": [
+      {
+        "name": "_ga",
+        "domain": ".example.com",
+        "path": "/",
+        "expires": 1671041478000,
+        "session": false
+      },
+      {
+        "name": "_gid",
+        "domain": ".example.com",
+        "path": "/",
+        "expires": 1608055878000,
+        "session": false
+      },
+      {
+        "name": "_gat",
+        "domain": ".example.com",
+        "path": "/",
+        "expires": 1607969538000,
+        "session": false
+      },
+      {
+        "name": "multidb_pin_writes",
+        "domain": "test.example.com",
+        "path": "/",
+        "expires": 1607969495363,
+        "session": false
+      }
+    ],
+    "requests": [
+      {
+        "url": "https://www.google-analytics.com/analytics.js",
+        "method": "GET",
+        "type": "Script",
+        "status": 200,
+        "size": 19218,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "cache-control": "public, max-age=7200",
+          "expires": "Mon, 14 Dec 2020 18:11:40 GMT"
+        },
+        "responseBodyHash": "e441c3e2771625ba05630ab464275136a82c99650ee2145ca5aa9853bedeb01b",
+        "initiators": [
+          "https://test.example.com/en-US/firefox/"
+        ],
+        "time": 0.016581999137997627
+      },
+      {
+        "url": "https://www.google-analytics.com/j/collect?v=1&_v=j87&a=2019442565&t=pageview&_s=1&dl=https%3A%2F%2Ftest.example.com%2Fen-US%2Ffirefox%2F&ul=en-us&de=UTF-8&dt=Add-ons%20for%20Firefox%20(en-US)&sd=24-bit&sr=800x600&vp=1440x812&je=0&_u=aEBAAEABEAAAAC~&jid=2093765751&gjid=174860062&cid=267908487.1607969479&tid=UA-36116321-7&_gid=897228099.1607969479&_r=1&z=1943713086",
+        "method": "POST",
+        "type": "XHR",
+        "status": 200,
+        "size": 208,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.011511998251080513
+      },
+      {
+        "url": "https://www.google-analytics.com/collect",
+        "method": "POST",
+        "type": "Other",
+        "status": 200,
+        "size": 424,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.01307000033557415
+      },
+      {
+        "url": "https://www.google-analytics.com/collect",
+        "method": "POST",
+        "type": "Other",
+        "status": 200,
+        "size": 58,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.013325000181794167
+      },
+      {
+        "url": "https://www.google-analytics.com/collect",
+        "method": "POST",
+        "type": "Other",
+        "status": 200,
+        "size": 58,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.015500999987125397
+      },
+      {
+        "url": "https://www.google-analytics.com/collect",
+        "method": "POST",
+        "type": "Other",
+        "status": 200,
+        "size": 58,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.011066999286413193
+      },
+      {
+        "url": "https://www.google-analytics.com/collect",
+        "method": "POST",
+        "type": "Other",
+        "status": 200,
+        "size": 58,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.010642999783158302
+      },
+      {
+        "url": "https://www.google-analytics.com/collect",
+        "method": "POST",
+        "type": "Other",
+        "status": 200,
+        "size": 58,
+        "remoteIPAddress": "172.217.13.78",
+        "responseHeaders": {
+          "access-control-allow-origin": "https://test.example.com",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "expires": "Fri, 01 Jan 1990 00:00:00 GMT",
+          "pragma": "no-cache"
+        },
+        "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
+        "initiators": [
+          "https://www.google-analytics.com/analytics.js"
+        ],
+        "time": 0.01091800071299076
+      },
+      {
+        "url": "https://dummy.tracker.com/collect",
+        "method": "GET",
+        "type": "XHR",
+        "status": 202,
+        "size": 1474,
+        "remoteIPAddress": "44.239.254.46",
+        "responseHeaders": {
+          "access-control-allow-origin": "*",
+          "set-cookie": "test_cookie=CheckForPermission; expires=Wed, 16-Dec-2020 01:46:25 GMT; path=/; domain=.tracker.com; Secure; SameSite=none"
+        },
+        "responseBodyHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "initiators": [
+          "https://test.example.com/test/"
+        ],
+        "time": 1.5189260002225637
+      }
+    ],
+    "targets": [
+      {
+        "type": "page",
+        "url": "about:blank"
+      }
+    ]
+  }
+}
