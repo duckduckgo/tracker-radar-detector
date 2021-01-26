@@ -21,7 +21,7 @@ class URL {
         try {
             const urlData = URL.parse(url)
             this.path = urlData.pathname
-        } catch(e) {
+        } catch (e) {
             console.warn(`\nSkipping unparsable url: ${url}`)
         }
     }

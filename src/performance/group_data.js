@@ -180,7 +180,7 @@ main()
  * @property {Array<number>} cpu
  */
 
- /**
+/**
  * @typedef {object} GlobalStats
  * @property {Array<number>} cache
  * @property {Array<number>} time
@@ -189,7 +189,7 @@ main()
  * @property {Array<number>} resourcesPerSite
  */
 
- /**
+/**
   * @typedef {object} Request
   * @property {string} url
   * @property {number} time

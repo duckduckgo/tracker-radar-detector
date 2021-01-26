@@ -54,7 +54,7 @@ function _update (commonReq, newReq, site) {
         commonReq.sites++
         commonReq.apis = _combineApis(commonReq.apis, newReq.apis)
 
-        if(newReq.data.subdomain) {
+        if (newReq.data.subdomain) {
             commonReq.subdomains.add(newReq.data.subdomain)
         }
 

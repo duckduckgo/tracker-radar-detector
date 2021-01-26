@@ -6,7 +6,7 @@ function getPerformance (domain, perfDirPath) {
     
     if (fs.existsSync(filePath)) {
         performance = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-    } else{
+    } else {
         return
     }
 

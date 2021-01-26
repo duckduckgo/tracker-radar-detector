@@ -23,7 +23,7 @@ function getFingerprintWeights (crawl) {
     let maxWeight = 0
     const setMaxWeight = []
 
-    for(const [api, apiScores] of Object.entries(crawl.fpWeights.apis)) {
+    for (const [api, apiScores] of Object.entries(crawl.fpWeights.apis)) {
         const trackingWt = apiScores.tracking / crawl.fpWeights.scripts.tracking
         const nontrackingWt = apiScores.nontracking / crawl.fpWeights.scripts.nontracking
 
