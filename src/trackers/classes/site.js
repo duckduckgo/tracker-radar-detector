@@ -120,6 +120,15 @@ function isRootSite(request, site) {
  */
 async function _processRequest (requestData, site) {
     const request = new Request(requestData, site)
+
+    if (!site.isFirstParty(request.url)) {
+        const nameservers = await shared.nameservers.resolveNs(request.domain)
+
+        if (nameservers) {
+            request.nameservers = nameservers
+        }
+    }
+
     // If this request is a subdomain of the site, see if it is cnamed
     if (site.isFirstParty(request.url) &&
         !shared.config.treatCnameAsFirstParty &&
@@ -140,6 +149,7 @@ async function _processRequest (requestData, site) {
             }
         }
     }
+   
 
     if (site.isFirstParty(request.url) && !shared.config.keepFirstParty) {
         return

@@ -38,6 +38,8 @@ class Tracker {
         }
 
         this.types = {}
+
+        this.nameservers = []
     }
 
     addTypes (type, count) {
@@ -49,7 +51,6 @@ class Tracker {
     }
 
     addRule (rule) {
-        this.resources.push(rule)
         this.subdomains = [...new Set(this.subdomains.concat(rule.subdomains))]
         rule.cnames.forEach(record => {
             if (!cname.containsCnameRecord(this.cnames, record)) {
@@ -57,6 +58,13 @@ class Tracker {
             }
         })
         this.cnames.sort((a,b) => a.original.localeCompare(b.original))
+
+        if (rule.nameservers && rule.nameservers.length) {
+            this.nameservers = [...new Set(this.nameservers.concat(rule.nameservers))]
+        }
+        
+        delete rule.nameservers
+        this.resources.push(rule)
     }
 
     addSurrogates () {

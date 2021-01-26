@@ -1,6 +1,5 @@
 const {getFingerprintRank} = require('./../helpers/fingerprints.js')
 const sharedData = require('./../helpers/sharedData.js')
-const ruleHelper = require('./../helpers/rule.js')
 
 class Rule {
     constructor (newRuleData, totalSites) {
@@ -15,9 +14,10 @@ class Rule {
         this.cnames = newRuleData.cnames
         this.responseHashes = newRuleData.responseHashes
         this.type = newRuleData.type
+        this.nameservers = newRuleData.nameservers
 
         if (sharedData.config.includeExampleSites) {
-            this.exampleSites = ruleHelper.getExampleSites(newRuleData.pages, sharedData.config.includeExampleSites)
+            this.exampleSites = newRuleData.exampleSites
         }
     }
 }
