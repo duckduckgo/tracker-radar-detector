@@ -94,10 +94,10 @@ describe('Process Crawl', () => {
                 cookies: 0.5,
                 firstPartyCookies: {
                     "_ga": {
-                        prevalence: 1,
+                        prevalence: 0.5,
                         length: 27,
                         uniqueness: 1,
-                        expiry: 2628000,
+                        ttl: 63113410,
                     }
                 }
             })

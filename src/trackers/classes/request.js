@@ -16,6 +16,8 @@ class Request {
         this.originalSubdomain = undefined
         this.responseHash = reqData.responseBodyHash
         this.nameservers = []
+        this.firstPartyCookies = site.documentCookies
+            .filter(cookie => cookie.source === reqData.url && cookie.domain.endsWith(site.domain))
     }
 
     /**

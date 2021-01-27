@@ -27,6 +27,7 @@ class CommonRequest {
         this.responseHashes = []
 
         this.firstPartyCookies = {}
+        this._processFirstPartyCookiesForRequest(request, site)
 
         this.nameservers = request.nameservers
     }
@@ -37,6 +38,24 @@ class CommonRequest {
 
     finalize (totalSites) {
         _finalize(this, totalSites)
+    }
+
+    _processFirstPartyCookiesForRequest(request, site) {
+        request.firstPartyCookies.forEach(cookie => {
+            if (!this.firstPartyCookies[cookie.name]) {
+                this.firstPartyCookies[cookie.name] = {
+                    pages: 0,
+                    ttl: [],
+                    lengthSum: 0,
+                    values: new Set(),
+                }
+            }
+            const cookieStats = this.firstPartyCookies[cookie.name]
+            cookieStats.pages += 1
+            cookieStats.ttl.push(cookie.ttl)
+            cookieStats.lengthSum += cookie.value.length
+            cookieStats.values.add(cookie.value)
+        })
     }
 }
 
@@ -78,6 +97,8 @@ function _update (commonReq, newReq, site) {
         if (newReq.responseHash && !commonReq.responseHashes.includes(newReq.responseHash)) {
             commonReq.responseHashes.push(newReq.responseHash)
         }
+
+        commonReq._processFirstPartyCookiesForRequest(newReq, site)
     }
 }
 
@@ -108,6 +129,16 @@ function _finalize (request, totalSites) {
 
     request.exampleSites = getExampleSites([...request.pages], sharedData.config.includeExampleSites)
     delete request.pages
+
+    Object.values(request.firstPartyCookies).forEach(cookie => {
+        cookie.length = Math.round(cookie.lengthSum / cookie.pages)
+        cookie.ttl = cookie.ttl.sort()[Math.floor(cookie.ttl.length / 2)]
+        cookie.prevalence = cookie.pages / totalSites
+        cookie.uniqueness = cookie.values.size / cookie.pages
+        delete cookie.lengthSum
+        delete cookie.values
+        delete cookie.pages
+    })
     
     request.subdomains = [...request.subdomains]
 }
