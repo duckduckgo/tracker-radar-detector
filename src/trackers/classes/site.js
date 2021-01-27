@@ -4,6 +4,8 @@ const URL = require('./../helpers/url.js')
 const cnameHelper = require('./../helpers/cname.js')
 const getOwner = require('./../helpers/getOwner.js')
 
+const {calculateCookieTtl,isSavedCookieSetterCall,parseCookie} = require('../helpers/cookies')
+
 class Site {
     constructor (siteData) {
         this.siteData = siteData
@@ -31,6 +33,11 @@ class Site {
         this.cnameCloaks = {}
 
         this.analyzeRequest = _analyzeRequest.bind(this)
+
+        this.documentCookies = siteData.data.apis.savedCalls.filter(isSavedCookieSetterCall)
+            .map(({source, arguments: args}) => Object.assign({source}, parseCookie(args[0])))
+            .map(cookie => Object.assign(cookie, {ttl: calculateCookieTtl(cookie, siteData.testStarted)}))
+    
     }
 
     async processRequest (requestData) {
