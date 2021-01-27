@@ -54,6 +54,18 @@ describe('Process Crawl', () => {
                 }
             })
         })
+
+        it('extracts document cookies', () => {
+            assert.deepStrictEqual(site.documentCookies, [{
+                domain: 'example.com',
+                expires: 'Thu, 15 Dec 2022 05:41:27 GMT',
+                name: '_ga',
+                path: '/',
+                source: 'https://www.google-analytics.com/analytics.js',
+                value: 'GA1.2.2073038129.1608010879',
+                ttl: 63113410,
+            }])
+        })
     })
 
     describe('crawl', () => {
@@ -80,6 +92,14 @@ describe('Process Crawl', () => {
             assert.strictEqual(crawl.commonRequests['google-analytics.com/analytics.js - Script'].apis['Navigator.prototype.userAgent'], 1)
             assertObjectPartial(crawl.commonRequests['google-analytics.com/analytics.js - Script'], {
                 cookies: 0.5,
+                firstPartyCookies: {
+                    "_ga": {
+                        prevalence: 1,
+                        length: 27,
+                        uniqueness: 1,
+                        expiry: 2628000,
+                    }
+                }
             })
     
             assertObjectPartial(crawl.commonRequests["tracker.com/collect - XHR"], {

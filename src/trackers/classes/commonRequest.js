@@ -26,6 +26,8 @@ class CommonRequest {
         this.cnames = request.wasCNAME ? [cname.createCnameRecord(request)] : []
         this.responseHashes = []
 
+        this.firstPartyCookies = {}
+
         this.nameservers = request.nameservers
     }
 
