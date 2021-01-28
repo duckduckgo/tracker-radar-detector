@@ -16,6 +16,7 @@ class Rule {
         this.type = newRuleData.type
         this.nameservers = newRuleData.nameservers
         this.firstPartyCookies = newRuleData.firstPartyCookies
+        this.firstPartyCookiesSent = newRuleData.firstPartyCookiesSent
 
         if (sharedData.config.includeExampleSites) {
             this.exampleSites = newRuleData.exampleSites

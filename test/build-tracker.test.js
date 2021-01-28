@@ -25,6 +25,9 @@ const commonRequestData1 = {
             uniqueness: 1,
             expiry: 2628000,
         }
+    },
+    firstPartyCookiesSent: {
+        "_ga": 0.5,
     }
 }
 const commonRequestData2 = {
@@ -97,6 +100,13 @@ describe('Tracker', () => {
                 uniqueness: 1,
                 expiry: 2628000,
             }
+        })
+    })
+
+    it('resource has firstPartyCookiesSent stats', () => {
+        const resource = tracker.resources[0]
+        assert.deepStrictEqual(resource.firstPartyCookiesSent, {
+            "_ga": 0.5
         })
     })
 })
