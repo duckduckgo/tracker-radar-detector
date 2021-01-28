@@ -146,6 +146,9 @@ function _finalize (request, totalSites) {
         delete cookie.values
         delete cookie.pages
     })
+    Object.keys(request.firstPartyCookiesSent).forEach(cookieName => {
+        request.firstPartyCookiesSent[cookieName] /= totalSites
+    })
     
     request.subdomains = [...request.subdomains]
 }
