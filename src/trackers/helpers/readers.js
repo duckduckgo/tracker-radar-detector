@@ -28,7 +28,7 @@ class JSONFileDataReader {
             // transparently expand gzipped files
             const fileData = file.endsWith('.gz')
                 ? (await dogunzip(await fs.promises.readFile(`${this.path}/${file}`))).toString('utf-8')
-                : fs.promises.readFile(`${this.path}/${file}`, 'utf8')
+                : await fs.promises.readFile(`${this.path}/${file}`, 'utf8')
             const siteData = JSON.parse(fileData)
             if (siteData.initialUrl) {
                 yield siteData
