@@ -18,6 +18,16 @@ class Request {
         this.nameservers = []
         this.firstPartyCookies = site.documentCookies
             .filter(cookie => cookie.source === reqData.url && cookie.domain.endsWith(site.domain))
+        this.firstPartyCookiesSent = site.documentCookies
+            .filter(cookie => {
+                // only consider cookies 5 or more characters long
+                if (cookie.value && cookie.value.length > 5) {
+                    // for longer cookie values, exclude the first 6 characters (GA cookies only send the suffix)
+                    const cookieSuffix = cookie.value.length > 10 ? cookie.value.slice(6) : cookie.value
+                    return this.url.indexOf(cookieSuffix) !== -1
+                }
+                return false
+            })
     }
 
     /**

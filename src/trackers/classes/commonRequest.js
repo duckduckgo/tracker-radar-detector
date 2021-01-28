@@ -27,7 +27,8 @@ class CommonRequest {
         this.responseHashes = []
 
         this.firstPartyCookies = {}
-        this._processFirstPartyCookiesForRequest(request, site)
+        this.firstPartyCookiesSent = {}
+        this._processFirstPartyCookiesForRequest(request)
 
         this.nameservers = request.nameservers
     }
@@ -40,7 +41,7 @@ class CommonRequest {
         _finalize(this, totalSites)
     }
 
-    _processFirstPartyCookiesForRequest(request, site) {
+    _processFirstPartyCookiesForRequest(request) {
         request.firstPartyCookies.forEach(cookie => {
             if (!this.firstPartyCookies[cookie.name]) {
                 this.firstPartyCookies[cookie.name] = {
@@ -55,6 +56,12 @@ class CommonRequest {
             cookieStats.ttl.push(cookie.ttl)
             cookieStats.lengthSum += cookie.value.length
             cookieStats.values.add(cookie.value)
+        })
+        request.firstPartyCookiesSent.forEach(cookie => {
+            if (!this.firstPartyCookiesSent[cookie.name]) {
+                this.firstPartyCookiesSent[cookie.name] = 0
+            }
+            this.firstPartyCookiesSent[cookie.name] += 1
         })
     }
 }

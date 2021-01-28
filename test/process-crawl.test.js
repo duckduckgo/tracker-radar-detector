@@ -115,6 +115,9 @@ describe('Process Crawl', () => {
                 sites: 1,
                 subdomains: ['dummy'],
                 type: "XHR",
+                firstPartyCookiesSent: {
+                    "_ga": 1,
+                }
             })
         })
 
