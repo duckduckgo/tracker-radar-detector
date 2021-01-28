@@ -5,8 +5,12 @@ const sharedData = require('./helpers/sharedData.js')
 const Progress = require('progress')
 
 const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
-const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
-const countryCode = crawlMetadata.config.regionCode || 'US'
+// when reading crawl data from disk the region can be found in the crawl metadata
+if (sharedData.config.crawlerDataLoc !== 'postgres') {
+    const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
+    sharedData.config.regionCode = crawlMetadata.config.regionCode
+}
+const countryCode = sharedData.config.regionCode || 'US'
 const crawledSiteTotal = newData.stats.sites
 const summary = {trackers: 0, entities: []}
 

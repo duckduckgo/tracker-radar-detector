@@ -40,6 +40,17 @@ npm run apply-entity-changes
 
 Note that if you wish to resolve CNAME's, node version 12+ is required. You can disable CNAME resolution by setting the option treatCnameAsFirstParty=true and keepFirstParty=false in the config file.
 
+### Postgresql data source
+
+Crawler data can also be read from a PostgreSQL database. To enable this, set the `crawlerDataLoc` to `postgres`, and set the `crawlId` and `region` options in `config.json`.
+Database details should be provided via environment variables, for example with `envdir`:
+
+```
+envdir /etc/ddg/dbenv/tracker_radar_readonly/ npm run build
+```
+
+See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
+
 ## Contributing
 
 ### Reporting bugs

@@ -3,6 +3,8 @@
     "trackerDataLoc": "path to your Tracker Radar repo",
     "crawlerDataLoc": "path to your 3rd party request directory",
     "performanceDataLoc": "path to your 3rd party performance directory",
+    "crawlId": "",
+    "regionCode": "US",
     "flags": {
         "addSurrogates": false
     },
