@@ -2,6 +2,8 @@ const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
 const getOwner = require('./../helpers/getOwner.js')
 
+const COOKIE_LENGTH_CUTOFF = 5
+
 class Request {
     constructor (reqData, site) {
         this.site = site
@@ -17,11 +19,11 @@ class Request {
         this.responseHash = reqData.responseBodyHash
         this.nameservers = []
         this.firstPartyCookies = site.documentCookies
-            .filter(cookie => cookie.source === reqData.url && cookie.domain.endsWith(site.domain))
+            .filter(cookie => cookie.source === reqData.url && (!cookie.domain || cookie.domain.endsWith(site.domain)) && cookie.value && cookie.value.length > COOKIE_LENGTH_CUTOFF)
         this.firstPartyCookiesSent = site.documentCookies
             .filter(cookie => {
                 // only consider cookies 5 or more characters long
-                if (cookie.value && cookie.value.length > 5) {
+                if (cookie.value && cookie.value.length > COOKIE_LENGTH_CUTOFF) {
                     // for longer cookie values, exclude the first 6 characters (GA cookies only send the suffix)
                     const cookieSuffix = cookie.value.length > 10 ? cookie.value.slice(6) : cookie.value
                     return this.url.indexOf(cookieSuffix) !== -1
