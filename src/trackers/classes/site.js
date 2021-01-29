@@ -35,6 +35,14 @@ class Site {
         this.analyzeRequest = _analyzeRequest.bind(this)
 
         this.documentCookies = siteData.data.apis.savedCalls.filter(isSavedCookieSetterCall)
+        this.documentCookies = siteData.data.apis.savedCalls
+            .filter(call => {
+                if (!isSavedCookieSetterCall(call) || !call.source.startsWith('http')) {
+                    return false
+                }
+                const sourceHost = tldts.parse(call.source)
+                return sourceHost.isIp ? sourceHost.host !== this.host : sourceHost.domain !== this.domain
+            })
             .map(({source, arguments: args}) => Object.assign({source}, parseCookie(args[0])))
             .map(cookie => Object.assign(cookie, {ttl: calculateCookieTtl(cookie, siteData.testStarted)}))
     
