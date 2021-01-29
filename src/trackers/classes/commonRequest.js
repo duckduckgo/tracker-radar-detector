@@ -120,7 +120,7 @@ function _combineApis (currApis, newApis) {
     return currApis
 }
 
-function _finalize (request, totalSites) {
+function _finalize (request, totalSites, cookieSentThreshold = 0.01) {
     // calclate the percent of sites the request is found on and percent of sites it sets cookies on
     request.cookies = Number(request.cookiesOn / totalSites)
     request.prevalence = Number(request.sites / totalSites)
@@ -146,9 +146,15 @@ function _finalize (request, totalSites) {
         delete cookie.values
         delete cookie.pages
     })
-    Object.keys(request.firstPartyCookiesSent).forEach(cookieName => {
-        request.firstPartyCookiesSent[cookieName] /= totalSites
-    })
+    request.firstPartyCookiesSent = Object.keys(request.firstPartyCookiesSent)
+        .reduce((obj, cookieName) => {
+            const sentCount = request.firstPartyCookiesSent[cookieName]
+            // filter cookies not sent enough
+            if (sentCount / request.sites > cookieSentThreshold) {
+                obj[cookieName] = sentCount / totalSites
+            }
+            return obj
+        }, {})
     
     request.subdomains = [...request.subdomains]
 }
