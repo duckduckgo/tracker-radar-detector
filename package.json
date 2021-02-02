@@ -29,7 +29,8 @@
     "underscore": "^1.9.1"
   },
   "devDependencies": {
-    "eslint": "^6.8.0"
+    "eslint": "^6.8.0",
+    "mocha": "^8.2.1"
   },
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=8096 ./src/trackers/process-crawl.js && ./src/trackers/build-trackers.js",
@@ -38,7 +39,7 @@
     "build-performance": "./src/performance/group_data.js && ./src/performance/create_stats.js",
     "update-entities": "./src/entities/update-entities.js",
     "apply-entity-changes": "./src/entities/apply-entity-changes.js",
-    "test": "npm run lint",
+    "test": "npm run lint && mocha",
     "lint": "eslint src/",
     "lint-fix": "npm run lint -- --fix"
   },
