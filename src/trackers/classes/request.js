@@ -22,7 +22,7 @@ class Request {
             .filter(cookie => cookie.source === reqData.url && (!cookie.domain || cookie.domain.endsWith(site.domain)) && cookie.value && cookie.value.length > COOKIE_LENGTH_CUTOFF)
         this.firstPartyCookiesSent = site.documentCookies
             .filter(cookie => {
-                // only consider cookies 5 or more characters long
+                // only consider cookies 6 or more characters long
                 if (cookie.value && cookie.value.length > COOKIE_LENGTH_CUTOFF) {
                     // for longer cookie values, exclude the first 6 characters (GA cookies only send the suffix)
                     const cookieSuffix = cookie.value.length > 10 ? cookie.value.slice(6) : cookie.value
