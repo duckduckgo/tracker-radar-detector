@@ -21,7 +21,7 @@ class Request {
         this.nameservers = []
         this.firstPartyCookies = site.documentCookies
             .filter(cookie => cookie.source === reqData.url && // cookie source is this request
-                cookie.value && cookie.value.length > COOKIE_LENGTH_CUTOFF && // cookie has a truthy value longer than 5 characters
+                cookie.value && // cookie has a truthy value
                 isFirstPartyCookie(cookie.domain, site.domain)) // cookie was set on the first party origin
         this.firstPartyCookiesSent = site.documentCookies
             .filter(cookie => {
