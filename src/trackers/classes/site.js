@@ -36,7 +36,7 @@ class Site {
 
         this.analyzeRequest = _analyzeRequest.bind(this)
 
-        this.documentCookies = Object.values(siteData.data.apis.savedCalls
+        this.thirdPartyJSCookies = Object.values(siteData.data.apis.savedCalls
             .filter(call => {
                 if (!isSavedCookieSetterCall(call) || !call.source.startsWith('http')) {
                     return false

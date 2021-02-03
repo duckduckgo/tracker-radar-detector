@@ -56,7 +56,7 @@ describe('Process Crawl', () => {
         })
 
         it('extracts document cookies', () => {
-            assert.deepStrictEqual(site.documentCookies, [{
+            assert.deepStrictEqual(site.thirdPartyJSCookies, [{
                 domain: 'example.com',
                 expires: 'Thu, 15 Dec 2022 05:41:27 GMT',
                 name: '_ga',
