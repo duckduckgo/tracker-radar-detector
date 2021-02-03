@@ -1,3 +1,4 @@
+const {getDomain} = require('tldts')
 
 /**
  * Returns true iff this savedCall is a valid call to document.cookie
@@ -40,8 +41,26 @@ function calculateCookieTtl(cookie, setAtTs) {
     return Math.floor((new Date(cookie.expires).getTime() - setAtTs) / 1000)
 }
 
+/**
+ * Given a cookie set on a site, returns true if this cookie was set on the 1st party
+ * @param {string} cookieDomain domain attribute of the cookie
+ * @param {string} siteGeneralDomain eTLD+1 of the 1st party website
+ * @returns {boolean}
+ */
+function isFirstPartyCookie(cookieDomain, siteGeneralDomain) {
+    // if the cookie has no domain attribute it is by default set on the host of the current
+    // document URL
+    if (!cookieDomain) {
+        return true
+    }
+    // a leading '.' in the domain is ignored in the current spec
+    const cleanCookieDomain = cookieDomain.startsWith('.') ? cookieDomain.slice(1) : cookieDomain
+    return siteGeneralDomain === cleanCookieDomain || siteGeneralDomain === getDomain(cleanCookieDomain)
+}
+
 module.exports = {
     isSavedCookieSetterCall,
     parseCookie,
     calculateCookieTtl,
+    isFirstPartyCookie,
 }
