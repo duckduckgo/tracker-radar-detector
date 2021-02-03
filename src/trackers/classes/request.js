@@ -1,7 +1,7 @@
 const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
 const getOwner = require('./../helpers/getOwner.js')
-const {isFirstPartyCookie} = require('./../helpers/cookies')
+const {isFirstPartyCookie,isCookieValueInUrl} = require('./../helpers/cookies')
 
 const COOKIE_LENGTH_CUTOFF = 5
 
@@ -26,12 +26,9 @@ class Request {
         this.firstPartyCookiesSent = site.documentCookies
             .filter(cookie => {
                 // only consider cookies 6 or more characters long
-                if (cookie.value && cookie.value.length > COOKIE_LENGTH_CUTOFF) {
-                    // for longer cookie values, exclude the first 6 characters (GA cookies only send the suffix)
-                    const cookieSuffix = cookie.value.length > 10 ? cookie.value.slice(6) : cookie.value
-                    return this.url.indexOf(cookieSuffix) !== -1
-                }
-                return false
+                return cookie.value &&
+                    cookie.value.length > COOKIE_LENGTH_CUTOFF &&
+                    isCookieValueInUrl(cookie, ParsedUrl.parse(reqData.url)) // TODO fix with url parsing update
             })
     }
 

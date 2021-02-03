@@ -58,9 +58,33 @@ function isFirstPartyCookie(cookieDomain, siteGeneralDomain) {
     return siteGeneralDomain === cleanCookieDomain || siteGeneralDomain === getDomain(cleanCookieDomain)
 }
 
+/**
+ * Set of handlers for apply custom search logic for specific cookies.
+ * e.g. for _ga cookies only the suffix is generally sent, so this handler will only use this part
+ * when searching for the cookie in a URL.
+ */
+const cookieHandlers = [{
+    canHandle: ({name}) => name === '_ga',
+    getValueSearchString: ({value}) => value.slice(6),
+}, {
+    canHandle: () => true,
+    getValueSearchString: ({value}) => value,
+}]
+/**
+ * Look for the value of a cookie in a URL. Returns true iff it is found, false otherwise.
+ * @param {*} cookie Parsed cookie
+ * @param {URL} url to check against
+ */
+function isCookieValueInUrl(cookie, url) {
+    const handler = cookieHandlers.find(h => h.canHandle(cookie))
+    const cookieValue = handler.getValueSearchString(cookie)
+    return url.pathname.indexOf(cookieValue) !== -1 || url.search.indexOf(cookieValue) !== -1
+}
+
 module.exports = {
     isSavedCookieSetterCall,
     parseCookie,
     calculateCookieTtl,
     isFirstPartyCookie,
+    isCookieValueInUrl,
 }

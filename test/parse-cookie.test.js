@@ -1,7 +1,7 @@
 const assert = require('assert')
 const {describe, it} = require('mocha')
 
-const {parseCookie,calculateCookieTtl,isFirstPartyCookie} = require('../src/trackers/helpers/cookies')
+const {parseCookie,calculateCookieTtl,isFirstPartyCookie,isCookieValueInUrl} = require('../src/trackers/helpers/cookies')
 
 const validCookies = [
     ['csm-hit=tb:s-ZP1GK7T6BAHZ943S3WS9|1607976278934&t:1607976279951&adb:adblk_no;expires=Mon, 29 Nov 2021 20:04:39 GMT;path=/', {
@@ -60,6 +60,33 @@ describe('isFirstPartyCookie', () => {
     firstPartyExamples.forEach(([cookieDomain, siteDomain, expected]) => {
         it(`isFirstPartyCookie(${cookieDomain}, ${siteDomain}) === ${expected}`, () => {
             assert.strictEqual(isFirstPartyCookie(cookieDomain, siteDomain), expected)
+        })
+    })
+})
+
+describe('isCookieValueInUrl', () => {
+    const mockCookie = parseCookie('foo=bar;path=/;max-age=3600')
+
+    it('returns true if the cookie value is in the url path', () => {
+        assert.strictEqual(isCookieValueInUrl(mockCookie, new URL('https://example.com/bar')), true)
+        assert.strictEqual(isCookieValueInUrl(mockCookie, new URL('https://example.com/bar/something')), true)
+        assert.strictEqual(isCookieValueInUrl(mockCookie, new URL('https://example.com/somebarthing')), true)
+    })
+
+    it('returns true if the cookie value is in the url query', () => {
+        assert.strictEqual(isCookieValueInUrl(mockCookie, new URL('https://example.com/?test=bar')), true)
+        assert.strictEqual(isCookieValueInUrl(mockCookie, new URL('https://example.com/?bar=foo')), true)
+    })
+
+    it('returns false if the cookie value is in the url hostname', () => {
+        assert.strictEqual(isCookieValueInUrl(mockCookie, new URL('https://bar.example.com/?test')), false)
+    })
+
+    describe('_ga cookie special case', () => {
+        const gaCookie = parseCookie('_ga=GA1.2.2073038129.1608010879; path=/; expires=Thu, 15 Dec 2022 05:41:27 GMT; domain=example.com;')
+
+        it('returns true if the _ga cookie is in the url', () => {
+            assert.strictEqual(isCookieValueInUrl(gaCookie, new URL('https://example.com/?ga=2073038129.1608010879')), true)
         })
     })
 })
