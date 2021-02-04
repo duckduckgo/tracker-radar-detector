@@ -186,7 +186,17 @@ function _getEntitySummaries (crawl) {
 function _writeSummaries (crawl) {
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/domain_summary.json`, JSON.stringify(_getDomainSummaries(crawl), null, 4))
 
-    fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests.json`, JSON.stringify({stats: crawl.stats, requests: crawl.commonRequests}, null, 4))
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/crawlStats.json`, JSON.stringify(crawl.stats, null, 4))
+
+    const requestsArray = Object.values(crawl.commonRequests)
+    const CHUNK = 500
+    const requestArrayLen = requestsArray.length
+
+    for (let i=0; i<requestArrayLen; i+=CHUNK) {
+        const requestArrayChunk = requestsArray.slice(i, i+CHUNK)
+        fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests-${i}.json`, JSON.stringify(requestArrayChunk, null, 4))
+    }
+
 
     _getEntitySummaries(crawl)
 
