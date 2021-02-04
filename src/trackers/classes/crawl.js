@@ -188,15 +188,15 @@ function _writeSummaries (crawl) {
 
     fs.writeFileSync(`${shared.config.trackerDataLoc}/crawlStats.json`, JSON.stringify(crawl.stats, null, 4))
 
+    // commonRequests array is to big to be stringified in one shot, we have to chunk it
     const requestsArray = Object.values(crawl.commonRequests)
     const CHUNK = 500
     const requestArrayLen = requestsArray.length
 
     for (let i=0; i<requestArrayLen; i+=CHUNK) {
         const requestArrayChunk = requestsArray.slice(i, i+CHUNK)
-        fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests-${i}.json`, JSON.stringify(requestArrayChunk, null, 4))
+        fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests-${i/CHUNK}.json`, JSON.stringify(requestArrayChunk, null, 4))
     }
-
 
     _getEntitySummaries(crawl)
 
