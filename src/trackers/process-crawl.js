@@ -47,15 +47,12 @@ async function processCrawl() {
         const sitesQueue = []
         for await (const siteData of reader.iterator()) {
             if (sitesQueue.length >= sharedData.config.parallelism) {
-                // wait for one of the sites to finish before reading next site
-                await Promise.race(sitesQueue)
+                // wait for one of the sites to finish processing before reading next site
+                const finishedPromise = await Promise.race(sitesQueue)
+                sitesQueue.splice(sitesQueue.indexOf(finishedPromise), 1)
             }
 
-            const processPromise = processSite(siteData)
-
-            sitesQueue.push(processPromise)
-            
-            processPromise.then(() => sitesQueue.splice(sitesQueue.indexOf(processPromise), 1))
+            sitesQueue.push(processSite(siteData))
         }
         await Promise.allSettled(sitesQueue)
         crawl.finalizeRequests()
