@@ -44,16 +44,20 @@ async function processCrawl() {
     try {
         bar = new Progress('Process crawl [:bar] :percent', {width: 40, total: await reader.length()})
 
-        let sites = []
+        const sitesQueue = []
         for await (const siteData of reader.iterator()) {
-            if (sites.length >= sharedData.config.parallelism) {
-                // wait for batch to finish before reading more site data
-                await Promise.allSettled(sites)
-                sites = []
+            if (sitesQueue.length >= sharedData.config.parallelism) {
+                // wait for one of the sites to finish before reading next site
+                await Promise.race(sitesQueue)
             }
-            sites.push(processSite(siteData))
+
+            const processPromise = processSite(siteData)
+
+            sitesQueue.push(processPromise)
+            
+            processPromise.then(() => sitesQueue.splice(sitesQueue.indexOf(processPromise), 1))
         }
-        await Promise.allSettled(sites)
+        await Promise.allSettled(sitesQueue)
         crawl.finalizeRequests()
         crawl.writeSummaries()
         console.log(`${chalk.blue(crawl.stats.sites)} sites processed\n${chalk.blue(crawl.stats.requests)} requests processed\n${chalk.blue(crawl.stats.requestsSkipped)} requests skipped`)
