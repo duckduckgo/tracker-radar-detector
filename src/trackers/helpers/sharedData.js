@@ -4,7 +4,7 @@ const chalk = require('chalk')
 const config = require('./../../../config.json')
 const categoryHelper = require(`./getCategory.js`)
 const entityHelper = require('./getEntityMap.js')
-const ParsedUrl = require('./parseUrl.js')
+const URL = require('./url.js')
 const NameServers = require('./nameserver.js')
 
 class SharedData {
@@ -73,7 +73,7 @@ function _getBreaking (dirPath) {
             if (file.match('breaking-request')) {
                 const groupedData = data.reduce((grouped, entry) => {
                     // unescape and get domain key
-                    const domain = new ParsedUrl(`http://${entry.rule.replace(/\\/g, "")}`).domain
+                    const domain = new URL(`http://${entry.rule.replace(/\\/g, "")}`).domain
                     grouped[domain] ? grouped[domain].push(entry) : grouped[domain] = [entry]
                     return grouped
                 }, {})
