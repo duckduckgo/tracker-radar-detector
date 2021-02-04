@@ -3,7 +3,6 @@ const chalk = require('chalk')
 
 const config = require('./../../../config.json')
 const categoryHelper = require(`./getCategory.js`)
-const entityHelper = require('./getEntityMap.js')
 const ParsedUrl = require('./parseUrl.js')
 const NameServers = require('./nameserver.js')
 
@@ -18,13 +17,11 @@ class SharedData {
         this.domains = _getJSON(`${build}/generated/domain_summary.json`) || {}
         this.abuseScores = _getJSON(`${build}/generated/api_fingerprint_weights.json`)
         this.categories = _getCategories()
-        if (fs.existsSync(`${cfg.trackerDataLoc}/entities`)) {
-            this.domainToEntity = _readEntities()
-            this.entityMap = entityHelper.entityMap(`${cfg.trackerDataLoc}/entities`)
-        } else {
-            this.domainToEntity = {}
-            this.entityMap = new Map()
-        }
+        
+        const {domainToEntity, entityMap} = _readEntities(`${cfg.trackerDataLoc}/entities`)
+        this.domainToEntity = domainToEntity
+        this.entityMap = entityMap
+
         this.breaking = _getBreaking(`${build}/static/breaking`)
         this.topExampleSitesSet = _getTopExampleSites(cfg)
         this.nameservers = NameServers
@@ -32,14 +29,25 @@ class SharedData {
 }
 
 // map entity domains to name for easy lookup
-function _readEntities () {
-    return fs.readdirSync(`${config.trackerDataLoc}/entities/`).reduce((domainList, entityFile) => {
-        const entityData = _getJSON(`${config.trackerDataLoc}/entities/${entityFile}`)
-        entityData.properties.forEach(url => {
-            domainList[url] = entityData
+function _readEntities (path) {
+    const domainToEntity = {}
+    const entityMap = new Map()
+
+    if (fs.existsSync(path)) {
+        fs.readdirSync(`${config.trackerDataLoc}/entities/`).forEach(entityFile => {
+            const entityData = _getJSON(`${config.trackerDataLoc}/entities/${entityFile}`)
+
+            entityData.properties.forEach(url => {
+                domainToEntity[url] = entityData
+                entityMap.set(url, entityData.name)
+            })
         })
-        return domainList
-    }, {})
+    }
+
+    return {
+        domainToEntity,
+        entityMap
+    }
 }
 
 // option list of top example sites to include in tracker files
