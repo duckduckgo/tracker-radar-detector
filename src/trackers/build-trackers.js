@@ -37,11 +37,6 @@ for (const key in newData.requests) {
     const fileName = `${newTrackerData.host}.json`
     const rule = new Rule(newTrackerData, newData.stats.sites)
 
-    if (!(rule.cookies || rule.fingerprinting)) {
-        bar.tick()
-        continue
-    }
-
     // create a new tracker file
     if (!trackers[fileName]) {
         log(`${chalk.yellow('Create tracker:')} ${key} ${fileName}`)
