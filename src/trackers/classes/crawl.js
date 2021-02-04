@@ -190,7 +190,7 @@ function _writeSummaries (crawl) {
 
     // commonRequests array is to big to be stringified in one shot, we have to chunk it
     const requestsArray = Object.values(crawl.commonRequests)
-    const CHUNK = 500
+    const CHUNK = 50000
     const requestArrayLen = requestsArray.length
 
     for (let i=0; i<requestArrayLen; i+=CHUNK) {
