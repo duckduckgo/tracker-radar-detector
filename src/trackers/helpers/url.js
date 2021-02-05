@@ -2,6 +2,14 @@ const {URL} = require('@cliqz/url-parser')
 const {parse} = require('tldts-experimental')
 
 class ParsedURL extends URL {
+
+    constructor(url) {
+        if (url.startsWith('blob:')) {
+            url = url.replace(/^blob:/, '')
+        }
+        super(url)
+    }
+
     get domainInfo() {
         // extend domainInfo to use PSL 
         if (!this._domainInfo) {
