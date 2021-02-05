@@ -3,7 +3,7 @@
  */
 
 const dns = require('dns').promises
-const ParsedUrl = require('./parseUrl.js')
+const URL = require('./url.js')
 const shared = require('./sharedData.js')
 
 
@@ -16,8 +16,8 @@ class CNAME {
      *
      * @return {Promise} The cname resolution
      */
-    static async resolveCname(url) {
-        url = ParsedUrl.parse(url)
+    static async resolveCname(urlString) {
+        const url = new URL(urlString)
         if (url.hostname in cache) {
             return cache[url.hostname]
         }

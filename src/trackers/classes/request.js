@@ -1,5 +1,5 @@
 const shared = require('./../helpers/sharedData.js')
-const ParsedUrl = require('./../helpers/parseUrl.js')
+const URL = require('./../helpers/url.js')
 const getOwner = require('./../helpers/getOwner.js')
 
 class Request {
@@ -24,7 +24,7 @@ class Request {
      */
     extractURLData(url) {
         this.url = url
-        this.data = new ParsedUrl(url)
+        this.data = new URL(url)
         this.domain = this.data.domain
         this.host = this.data.hostname
         this.path = this.path || this.data.path

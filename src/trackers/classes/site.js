@@ -1,6 +1,6 @@
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
-const ParsedUrl = require('./../helpers/parseUrl.js')
+const URL = require('./../helpers/url.js')
 const cnameHelper = require('./../helpers/cname.js')
 const getOwner = require('./../helpers/getOwner.js')
 
@@ -8,7 +8,7 @@ class Site {
     constructor (siteData) {
         this.siteData = siteData
 
-        const url = new ParsedUrl(siteData.initialUrl)
+        const url = new URL(siteData.initialUrl)
         this.host = url.hostname
         this.domain = url.domain
         this.subdomain = url.subdomain
@@ -44,7 +44,7 @@ class Site {
 function _getCookies (siteData) {
     return (siteData.data.cookies || []).reduce((cookieObj, cookie) => {
         // some domains will have a leading period we need to remove
-        const cookieHost = new ParsedUrl(`http://${cookie.domain.replace(/^\./,'')}`).hostname
+        const cookieHost = new URL(`http://${cookie.domain.replace(/^\./,'')}`).hostname
         cookieObj[`${cookieHost}${cookie.path}`]
         return cookieObj
     }, [])
@@ -56,7 +56,7 @@ function _getCookies (siteData) {
  * @returns {bool} True if the url is in this sites first party set.
  */
 function _isFirstParty(url) {
-    const data = new ParsedUrl(url)
+    const data = new URL(url)
     const dataOwner = getOwner(data.domain)
     if (data.domain === this.domain || ((dataOwner && this.owner) && dataOwner === this.owner)) {
         return true
@@ -108,7 +108,7 @@ function _analyzeRequest(request, site) {
  */
 function isRootSite(request, site) {
     const isInitial = `${request.data.subdomain}.${request.data.domain}` === `${site.subdomain}.${site.domain}`
-    const finalURL = site.siteData.finalUrl ? new ParsedUrl(site.siteData.finalUrl) : ''
+    const finalURL = site.siteData.finalUrl ? new URL(site.siteData.finalUrl) : ''
     const isFinal = `${request.data.subdomain}.${request.data.domain}` === `${finalURL.subdomain}.${finalURL.domain}`
     return isInitial || isFinal
 }
@@ -138,11 +138,13 @@ async function _processRequest (requestData, site) {
         const cnames = await cnameHelper.resolveCname(request.url)
         if (cnames) {
             for (const cname of cnames) {
-                if (!site.isFirstParty(cname)) {
+                // make a URL with this CNAME to be passed to `isFirstParty` and `extractURLData`
+                const cnameUrl = `http://${cname}`
+                if (!site.isFirstParty(cnameUrl)) {
                     // console.log(`Third Party CNAME: ${request.data.subdomain}.${request.data.domain} -> ${cname}`)
                     const origSubDomain = request.data.subdomain + "." + request.data.domain
                     site.cnameCloaks[cname] = request.data.subdomain + "." + request.data.domain
-                    request.extractURLData(cname)
+                    request.extractURLData(cnameUrl)
                     request.wasCNAME = true
                     request.originalSubdomain = origSubDomain
                 }
