@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const {median, std} = require('mathjs')
 const shared = require('./../helpers/sharedData.js')
 const CommonRequest = require('./commonRequest.js')
@@ -192,6 +193,13 @@ function _writeSummaries (crawl) {
     const requestsArray = Object.values(crawl.commonRequests)
     const CHUNK = 50000
     const requestArrayLen = requestsArray.length
+
+    // remove old chunks
+    fs.readdirSync(`${shared.config.trackerDataLoc}/`).forEach(file => {
+        if (file.startsWith('commonRequests-') && file.endsWith('.json')) {
+            fs.unlinkSync(path.join(shared.config.trackerDataLoc, file))
+        }
+    })
 
     for (let i=0; i<requestArrayLen; i+=CHUNK) {
         const requestArrayChunk = requestsArray.slice(i, i+CHUNK)
