@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 const {median, std} = require('mathjs')
 const shared = require('./../helpers/sharedData.js')
 const CommonRequest = require('./commonRequest.js')
@@ -186,7 +187,24 @@ function _getEntitySummaries (crawl) {
 function _writeSummaries (crawl) {
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/domain_summary.json`, JSON.stringify(_getDomainSummaries(crawl), null, 4))
 
-    fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests.json`, JSON.stringify({stats: crawl.stats, requests: crawl.commonRequests}, null, 4))
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/crawlStats.json`, JSON.stringify(crawl.stats, null, 4))
+
+    // commonRequests array is to big to be stringified in one shot, we have to chunk it
+    const requestsArray = Object.values(crawl.commonRequests)
+    const CHUNK = 50000
+    const requestArrayLen = requestsArray.length
+
+    // remove old chunks
+    fs.readdirSync(`${shared.config.trackerDataLoc}/`).forEach(file => {
+        if (file.startsWith('commonRequests-') && file.endsWith('.json')) {
+            fs.unlinkSync(path.join(shared.config.trackerDataLoc, file))
+        }
+    })
+
+    for (let i=0; i<requestArrayLen; i+=CHUNK) {
+        const requestArrayChunk = requestsArray.slice(i, i+CHUNK)
+        fs.writeFileSync(`${shared.config.trackerDataLoc}/commonRequests-${i/CHUNK}.json`, JSON.stringify(requestArrayChunk, null, 4))
+    }
 
     _getEntitySummaries(crawl)
 

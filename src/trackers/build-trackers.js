@@ -4,14 +4,23 @@ const chalk = require('chalk')
 const sharedData = require('./helpers/sharedData.js')
 const Progress = require('progress')
 
-const newData = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests.json`, 'utf8'))
+const newDataStats = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/crawlStats.json`, 'utf8'))
+let requestsArray = []
+
+let chunk = 0
+while (fs.existsSync(`${sharedData.config.trackerDataLoc}/commonRequests-${chunk}.json`)) {
+    const requests = JSON.parse(fs.readFileSync(`${sharedData.config.trackerDataLoc}/commonRequests-${chunk}.json`, 'utf8'))
+    requestsArray = requestsArray.concat(requests)
+    chunk++
+}
+
 // when reading crawl data from disk the region can be found in the crawl metadata
 if (sharedData.config.crawlerDataLoc !== 'postgres') {
     const crawlMetadata = JSON.parse(fs.readFileSync(`${sharedData.config.crawlerDataLoc}/metadata.json`, 'utf8'))
     sharedData.config.regionCode = crawlMetadata.config.regionCode
 }
 const countryCode = sharedData.config.regionCode || 'US'
-const crawledSiteTotal = newData.stats.sites
+const crawledSiteTotal = newDataStats.sites
 const summary = {trackers: 0, entities: []}
 
 let requestPageMap = {}
@@ -28,23 +37,17 @@ const Rule = require(`./classes/rule.js`)
 const trackers = {}
 const trackerPageMap = {}
 
-const bar = new Progress('Building trackers [:bar] :percent', {width: 40, total: Object.keys(newData.requests).length})
+const bar = new Progress('Building trackers [:bar] :percent', {width: 40, total: requestsArray.length})
 
 // Run through all the new trackers in our crawl data.
 // Either create a new tracker entry or update an existing
-for (const key in newData.requests) {
-    const newTrackerData = newData.requests[key]
+requestsArray.forEach(newTrackerData => {
     const fileName = `${newTrackerData.host}.json`
-    const rule = new Rule(newTrackerData, newData.stats.sites)
-
-    if (!(rule.cookies || rule.fingerprinting)) {
-        bar.tick()
-        continue
-    }
+    const rule = new Rule(newTrackerData, newDataStats.sites)
 
     // create a new tracker file
     if (!trackers[fileName]) {
-        log(`${chalk.yellow('Create tracker:')} ${key} ${fileName}`)
+        log(`${chalk.yellow('Create tracker:')} ${newTrackerData.rule} - ${newTrackerData.type} ${fileName}`)
         const tracker = new Tracker(newTrackerData, crawledSiteTotal)
         tracker.addRule(rule)
         tracker.addTypes(newTrackerData.type, newTrackerData.sites)
@@ -70,7 +73,7 @@ for (const key in newData.requests) {
     }
 
     bar.tick()
-}
+})
 
 if (!fs.existsSync(`${sharedData.config.trackerDataLoc}/domains/${countryCode}`)) {
     fs.mkdirSync(`${sharedData.config.trackerDataLoc}/domains/${countryCode}`)
