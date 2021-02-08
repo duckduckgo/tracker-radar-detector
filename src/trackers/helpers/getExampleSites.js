@@ -1,5 +1,5 @@
 const sharedData = require('./sharedData.js')
-const tldts = require('tldts')
+const tldts = require('tldts-experimental')
 
 // Adds example sites for each rule if enabled in the config file
 // Half of the sites can be chosen from a top sites list provided in the config. 

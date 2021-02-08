@@ -1,4 +1,4 @@
-const tldjs = require('tldjs')
+const tldts = require('tldts-experimental')
 const performanceHelper = require('./../helpers/getPerformance.js')
 const sharedData = require('./../helpers/sharedData.js')
 const {getFingerprintRank} = require('./../helpers/fingerprints.js')
@@ -27,7 +27,7 @@ class Tracker {
         
         if (policy) {
             this.owner.privacyPolicy = policy
-            this.owner.url = `http://${tldjs.parse(policy).domain}`
+            this.owner.url = `http://${tldts.parse(policy).domain}`
         }
 
         const breaking = _getBreaking(this.domain)
