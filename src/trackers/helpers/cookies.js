@@ -1,4 +1,4 @@
-const {getDomain} = require('tldts')
+const {getDomain} = require('tldts-experimental')
 
 /**
  * Returns true iff this savedCall is a valid call to document.cookie

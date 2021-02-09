@@ -28,7 +28,7 @@ class Request {
                 // only consider cookies 6 or more characters long
                 return cookie.value &&
                     cookie.value.length > COOKIE_LENGTH_CUTOFF &&
-                    isCookieValueInUrl(cookie, ParsedUrl.parse(reqData.url)) // TODO fix with url parsing update
+                    isCookieValueInUrl(cookie, new URL(reqData.url))
             })
     }
 

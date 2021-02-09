@@ -1,4 +1,4 @@
-const tldts = require('tldts')
+const tldts = require('tldts-experimental')
 
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
