@@ -27,6 +27,13 @@
           "arguments": [
             "_ga=GA1.2.2073038129.1608010879; path=/; expires=Thu, 15 Dec 2022 05:41:27 GMT; domain=example.com;"
           ]
+        },
+        {
+          "source": "https://test.example.com/",
+          "description": "Document.cookie setter",
+          "arguments": [
+            "test=helloworld; path=/; expires=Thu, 15 Dec 2022 05:41:27 GMT; domain=example.com;"
+          ]
         }
       ]
     },
@@ -212,7 +219,7 @@
         "time": 0.01091800071299076
       },
       {
-        "url": "https://dummy.tracker.com/collect",
+        "url": "https://dummy.tracker.com/collect?gaid=2073038129.1608010879",
         "method": "GET",
         "type": "XHR",
         "status": 202,

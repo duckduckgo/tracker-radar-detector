@@ -18,6 +18,17 @@ const commonRequestData1 = {
     sites: 2,
     subdomains: new Set(['dummy']),
     type: "XHR",
+    firstPartyCookies: {
+        "_uid": {
+            prevalence: 0.8,
+            length: 14,
+            uniqueness: 1,
+            expiry: 2628000,
+        }
+    },
+    firstPartyCookiesSent: {
+        "_ga": 0.5,
+    }
 }
 const commonRequestData2 = {
     apis: {},
@@ -78,5 +89,24 @@ describe('Tracker', () => {
         assert.strictEqual(resource.type, 'XHR')
         assert.strictEqual(resource.prevalence, 1)
         assert.strictEqual(resource.sites, 2)
+    })
+
+    it('resource has firstPartyCookies stats', () => {
+        const resource = tracker.resources[0]
+        assert.deepStrictEqual(resource.firstPartyCookies, {
+            "_uid": {
+                prevalence: 0.8,
+                length: 14,
+                uniqueness: 1,
+                expiry: 2628000,
+            }
+        })
+    })
+
+    it('resource has firstPartyCookiesSent stats', () => {
+        const resource = tracker.resources[0]
+        assert.deepStrictEqual(resource.firstPartyCookiesSent, {
+            "_ga": 0.5
+        })
     })
 })

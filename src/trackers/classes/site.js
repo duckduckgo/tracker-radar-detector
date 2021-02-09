@@ -1,8 +1,12 @@
+const tldts = require('tldts-experimental')
+
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
 const cnameHelper = require('./../helpers/cname.js')
 const getOwner = require('./../helpers/getOwner.js')
+
+const {calculateCookieTtl,isSavedCookieSetterCall,parseCookie} = require('../helpers/cookies')
 
 class Site {
     constructor (siteData) {
@@ -31,6 +35,22 @@ class Site {
         this.cnameCloaks = {}
 
         this.analyzeRequest = _analyzeRequest.bind(this)
+
+        this.thirdPartyJSCookies = Object.values(siteData.data.apis.savedCalls
+            .filter(call => {
+                if (!isSavedCookieSetterCall(call) || !call.source.startsWith('http')) {
+                    return false
+                }
+                const sourceHost = tldts.parse(call.source)
+                return sourceHost.isIp ? sourceHost.host !== this.host : sourceHost.domain !== this.domain
+            })
+            .reduce((obj, {source, arguments: args}) => {
+                // reduce to an object with cookie name as the key to deduplicate multiple sets to the same cookie
+                const cookie = {...parseCookie(args[0]), source}
+                cookie.ttl = calculateCookieTtl(cookie, siteData.testStarted)
+                obj[`${source}-${cookie.name}`] = cookie
+                return obj
+            }, {}))
     }
 
     async processRequest (requestData) {

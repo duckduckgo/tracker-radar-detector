@@ -26,6 +26,10 @@ class CommonRequest {
         this.cnames = request.wasCNAME ? [cname.createCnameRecord(request)] : []
         this.responseHashes = []
 
+        this.firstPartyCookies = {}
+        this.firstPartyCookiesSent = {}
+        this._processFirstPartyCookiesForRequest(request)
+
         this.nameservers = request.nameservers
     }
 
@@ -35,6 +39,30 @@ class CommonRequest {
 
     finalize (totalSites) {
         _finalize(this, totalSites)
+    }
+
+    _processFirstPartyCookiesForRequest(request) {
+        request.firstPartyCookies.forEach(cookie => {
+            if (!this.firstPartyCookies[cookie.name]) {
+                this.firstPartyCookies[cookie.name] = {
+                    pages: 0,
+                    ttl: [],
+                    lengthSum: 0,
+                    values: new Set(),
+                }
+            }
+            const cookieStats = this.firstPartyCookies[cookie.name]
+            cookieStats.pages += 1
+            cookieStats.ttl.push(cookie.ttl)
+            cookieStats.lengthSum += cookie.value.length
+            cookieStats.values.add(cookie.value)
+        })
+        request.firstPartyCookiesSent.forEach(cookie => {
+            if (!this.firstPartyCookiesSent[cookie.name]) {
+                this.firstPartyCookiesSent[cookie.name] = 0
+            }
+            this.firstPartyCookiesSent[cookie.name] += 1
+        })
     }
 }
 
@@ -76,6 +104,8 @@ function _update (commonReq, newReq, site) {
         if (newReq.responseHash && !commonReq.responseHashes.includes(newReq.responseHash)) {
             commonReq.responseHashes.push(newReq.responseHash)
         }
+
+        commonReq._processFirstPartyCookiesForRequest(newReq, site)
     }
 }
 
@@ -90,7 +120,7 @@ function _combineApis (currApis, newApis) {
     return currApis
 }
 
-function _finalize (request, totalSites) {
+function _finalize (request, totalSites, cookieSentThreshold = 0.01) {
     // calclate the percent of sites the request is found on and percent of sites it sets cookies on
     request.cookies = Number(request.cookiesOn / totalSites)
     request.prevalence = Number(request.sites / totalSites)
@@ -106,6 +136,25 @@ function _finalize (request, totalSites) {
 
     request.exampleSites = getExampleSites([...request.pages], sharedData.config.includeExampleSites)
     delete request.pages
+
+    Object.values(request.firstPartyCookies).forEach(cookie => {
+        cookie.length = Math.round(cookie.lengthSum / cookie.pages)
+        cookie.ttl = cookie.ttl.sort()[Math.floor(cookie.ttl.length / 2)]
+        cookie.prevalence = cookie.pages / totalSites
+        cookie.uniqueness = cookie.values.size / cookie.pages
+        delete cookie.lengthSum
+        delete cookie.values
+        delete cookie.pages
+    })
+    request.firstPartyCookiesSent = Object.keys(request.firstPartyCookiesSent)
+        .reduce((obj, cookieName) => {
+            const sentCount = request.firstPartyCookiesSent[cookieName]
+            // filter cookies not sent enough
+            if (sentCount / request.sites > cookieSentThreshold) {
+                obj[cookieName] = sentCount / totalSites
+            }
+            return obj
+        }, {})
     
     request.subdomains = [...request.subdomains]
 }

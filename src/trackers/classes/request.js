@@ -1,6 +1,9 @@
 const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
 const getOwner = require('./../helpers/getOwner.js')
+const {isFirstPartyCookie,isCookieValueInUrl} = require('./../helpers/cookies')
+
+const COOKIE_LENGTH_CUTOFF = 5
 
 class Request {
     constructor (reqData, site) {
@@ -16,6 +19,17 @@ class Request {
         this.originalSubdomain = undefined
         this.responseHash = reqData.responseBodyHash
         this.nameservers = []
+        this.firstPartyCookies = site.thirdPartyJSCookies
+            .filter(cookie => cookie.source === reqData.url && // cookie source is this request
+                cookie.value && // cookie has a truthy value
+                isFirstPartyCookie(cookie.domain, site.domain)) // cookie was set on the first party origin
+        this.firstPartyCookiesSent = site.thirdPartyJSCookies
+            .filter(cookie => {
+                // only consider cookies 6 or more characters long
+                return cookie.value &&
+                    cookie.value.length > COOKIE_LENGTH_CUTOFF &&
+                    isCookieValueInUrl(cookie, new URL(reqData.url))
+            })
     }
 
     /**
@@ -47,7 +61,6 @@ function _setsCookies (req) {
         return true
     }
     return false
-    
 }
 
 module.exports = Request
