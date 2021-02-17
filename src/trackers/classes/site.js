@@ -5,6 +5,7 @@ const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
 const cnameHelper = require('./../helpers/cname.js')
 const getOwner = require('./../helpers/getOwner.js')
+const {TLDTS_OPTIONS} = require('../helpers/const')
 
 const {calculateCookieTtl,isSavedCookieSetterCall,parseCookie} = require('../helpers/cookies')
 
@@ -41,7 +42,7 @@ class Site {
                 if (!isSavedCookieSetterCall(call) || !call.source.startsWith('http')) {
                     return false
                 }
-                const sourceHost = tldts.parse(call.source)
+                const sourceHost = tldts.parse(call.source, TLDTS_OPTIONS)
                 return sourceHost.isIp ? sourceHost.host !== this.host : sourceHost.domain !== this.domain
             })
             .reduce((obj, {source, arguments: args}) => {

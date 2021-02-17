@@ -3,6 +3,7 @@ const performanceHelper = require('./../helpers/getPerformance.js')
 const sharedData = require('./../helpers/sharedData.js')
 const {getFingerprintRank} = require('./../helpers/fingerprints.js')
 const cname = require('./../helpers/cname.js')
+const {TLDTS_OPTIONS} = require('../helpers/const')
 
 class Tracker {
     constructor(trackerData, crawledSiteTotal) {
@@ -27,7 +28,7 @@ class Tracker {
         
         if (policy) {
             this.owner.privacyPolicy = policy
-            this.owner.url = `http://${tldts.parse(policy).domain}`
+            this.owner.url = `http://${tldts.parse(policy, TLDTS_OPTIONS).domain}`
         }
 
         const breaking = _getBreaking(this.domain)

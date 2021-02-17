@@ -1,5 +1,7 @@
 const {URL} = require('@cliqz/url-parser')
 const {parse} = require('tldts-experimental')
+const {TLDTS_OPTIONS} = require('./const')
+
 
 class ParsedURL extends URL {
 
@@ -15,7 +17,7 @@ class ParsedURL extends URL {
         if (!this._domainInfo) {
             this._domainInfo = parse(this.hostname, {
                 extractHostname: false,
-                allowPrivateDomains: true,
+                ...TLDTS_OPTIONS
             })
         }
         return this._domainInfo
