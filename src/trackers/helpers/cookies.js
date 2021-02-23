@@ -1,4 +1,5 @@
 const {getDomain} = require('tldts-experimental')
+const {TLDTS_OPTIONS} = require('../helpers/const')
 
 /**
  * Returns true iff this savedCall is a valid call to document.cookie
@@ -55,7 +56,7 @@ function isFirstPartyCookie(cookieDomain, siteGeneralDomain) {
     }
     // a leading '.' in the domain is ignored in the current spec
     const cleanCookieDomain = cookieDomain.startsWith('.') ? cookieDomain.slice(1) : cookieDomain
-    return siteGeneralDomain === cleanCookieDomain || siteGeneralDomain === getDomain(cleanCookieDomain)
+    return siteGeneralDomain === cleanCookieDomain || siteGeneralDomain === getDomain(cleanCookieDomain, TLDTS_OPTIONS)
 }
 
 /**

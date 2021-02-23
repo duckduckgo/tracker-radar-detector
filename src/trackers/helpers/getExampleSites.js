@@ -1,5 +1,6 @@
 const sharedData = require('./sharedData.js')
 const tldts = require('tldts-experimental')
+const {TLDTS_OPTIONS} = require('../helpers/const')
 
 // Adds example sites for each rule if enabled in the config file
 // Half of the sites can be chosen from a top sites list provided in the config. 
@@ -10,7 +11,7 @@ function getExampleSites (sites, limit) {
         if (!site) {
             return false
         }
-        const parsedSite = tldts.parse(site)
+        const parsedSite = tldts.parse(site, TLDTS_OPTIONS)
         return !parsedSite.isIp
     })
 

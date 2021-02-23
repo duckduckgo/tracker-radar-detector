@@ -85,7 +85,7 @@ async function main() {
         const locallyGroupped = new Map()
 
         requests.forEach(request => {
-            const urlObj = tldts.parse(request.url)
+            const urlObj = tldts.parse(request.url, {allowPrivateDomains: true})
             const index = urlObj.domain
             
             const grouppedEntry = locallyGroupped.get(index) || {time: [], size: [], cache: [], cpu: []}
