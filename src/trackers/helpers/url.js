@@ -33,6 +33,14 @@ class ParsedURL extends URL {
     get subdomain() {
         return this.domainInfo.subdomain
     }
+
+    /**
+     * Cut any parameter string from the URL path
+     */
+    get path() {
+        const pathname = this.pathname
+        return pathname.split(';')[0]
+    }
 }
 
 module.exports = ParsedURL
