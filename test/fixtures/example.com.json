@@ -219,7 +219,7 @@
         "time": 0.01091800071299076
       },
       {
-        "url": "https://dummy.tracker.com/collect?gaid=2073038129.1608010879",
+        "url": "https://dummy.tracker.com/collect;some=parameterstring?gaid=2073038129.1608010879",
         "method": "GET",
         "type": "XHR",
         "status": 202,
