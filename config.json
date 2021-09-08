@@ -1,6 +1,7 @@
 {
     "minSites": 2,
     "trackerDataLoc": "path to your Tracker Radar repo",
+    "surrogatesDataLoc": "path to your copy of duckduckgo/tracker-surrogates repo",
     "crawlerDataLoc": "path to your 3rd party request directory",
     "performanceDataLoc": "path to your 3rd party performance directory",
     "crawlId": "",
