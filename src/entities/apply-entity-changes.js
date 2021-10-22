@@ -169,7 +169,7 @@ const generateDomainMap = updatedEntityMap => {
         const entity = updatedEntityMap[name]
         entity.properties.forEach(d => {
             if (sortedDomainMap[d]) {
-                console.log(`${d} already belongs to ${sortedDomainMap[d].entityName}, can't add to ${name}`)
+                throw `[ALERT] ${d} has multiple owners: ${sortedDomainMap[d].entityName} and ${name}. Choose one, update entity_map.json and try again.`
             }
             sortedDomainMap[d] = {entityName: name, aliases: entity.aliases, displayName: entity.displayName}
         })
