@@ -37,8 +37,8 @@
     "process-crawl": "./src/trackers/process-crawl.js",
     "build-trackers": "./src/trackers/build-trackers.js",
     "build-performance": "./src/performance/group_data.js && ./src/performance/create_stats.js",
-    "update-entities": "./src/entities/update-entities.js",
-    "apply-entity-changes": "./src/entities/apply-entity-changes.js",
+    "update-entities": "node src/entities/update-entities.js",
+    "apply-entity-changes": "node src/entities/apply-entity-changes.js",
     "test": "npm run lint && mocha",
     "lint": "eslint src/",
     "lint-fix": "npm run lint -- --fix"
