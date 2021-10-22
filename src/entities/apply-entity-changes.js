@@ -3,20 +3,19 @@ const tldts = require('tldts-experimental')
 const parse = require('csv-parse/lib/sync')
 const config = require('./../../config.json')
 const entityDir = `${config.trackerDataLoc}/entities`
-let entityMap = require(`${config.trackerDataLoc}/build-data/generated/entity_map.json`)
+const entityMap = require(`${config.trackerDataLoc}/build-data/generated/entity_map.json`)
 const domainMap = require(`${config.trackerDataLoc}/build-data/generated/domain_map.json`)
 const shortNames = require('./shortNames.js')
+const dataToIngest = process.argv[2] ? require(`${process.argv[2]}`) : undefined
 
 const applyChanges = () => {
     if (fs.existsSync('./data/entityUpdates.csv')) {
         applyCSVChanges()
+    } else if (process.argv[2]) {
+        console.log(`Importing data from ${process.argv[2]}`)
+        applyManualChanges()
     } else {
-        if (process.argv[2]) {
-            console.log(`Importing data from ${process.argv[2]}`)
-            applyManualChanges()
-        } else {
-            console.log("No file passed to command, processing manual changes to entity_map.json")
-        }
+        console.log("No file passed to command, processing manual changes to entity_map.json")
     }
 
     // sort properties and aliases alphabetically
@@ -24,11 +23,10 @@ const applyChanges = () => {
         const sortedProperties = entityMap[hostname].properties.sort()
         const sortedAliases = entityMap[hostname].aliases.sort()
 
-        sortedProperties.forEach((prop) => {
+        sortedProperties.forEach(prop => {
             const validDomain = tldts.getDomain(prop)
             if (!validDomain) {
-                console.log('INVALID DOMAIN: ', prop)
-                throw 'INVALID DOMAIN'
+                throw new Error(`INVALID DOMAIN: ${prop}`)
             }
         })
         entityMap[hostname].properties = Array.from(new Set(sortedProperties))
@@ -36,7 +34,7 @@ const applyChanges = () => {
     }
 
     // sort map alphabetically
-    let sortedEntityMap = {}
+    const sortedEntityMap = {}
     Object.keys(entityMap).sort().forEach(key => {
         sortedEntityMap[key] = entityMap[key]
     })
@@ -62,7 +60,7 @@ const applyCSVChanges = () => {
         const oldName = row.existingEntityName
         const name = row.newEntityName
         const shortName = row.displayName
-        let oldEntity = entityMap[oldName] ? entityMap[oldName] : {}
+        const oldEntity = entityMap[oldName] ? entityMap[oldName] : {}
         let newEntity = entityMap[name]
 
         // remove old entity if exists, merge into new one
@@ -91,7 +89,6 @@ const applyCSVChanges = () => {
 }
 
 const applyManualChanges = () => {
-    const dataToIngest = require(`${process.argv[2]}`)
     for (const corp in dataToIngest) {
         const domains = dataToIngest[corp].properties || []
         const aliases = dataToIngest[corp].aliases || []
@@ -101,7 +98,7 @@ const applyManualChanges = () => {
         // first check if entity already exists. if it does, add domains and aliases to it.
         // otherwise create new entity
         if (entityMap[corp]) {
-            let existingEntity = entityMap[corp]
+            const existingEntity = entityMap[corp]
             existingEntity.aliases = existingEntity.aliases.concat(aliases)
 
             // check if domains previously belonged to different entity.
@@ -117,8 +114,8 @@ const applyManualChanges = () => {
                 const previousName = domainMap[domain] && domainMap[domain].entityName
 
                 if (previousName) {
-                    let previousEntity = entityMap[previousName]
-                    if (!previousEntity) continue
+                    const previousEntity = entityMap[previousName]
+                    if (!previousEntity) {continue} // eslint-disable-line max-depth
 
                     existingEntity.aliases = existingEntity.aliases.concat(previousEntity.aliases)
                     existingEntity.properties = existingEntity.properties.concat(previousEntity.properties)
@@ -131,7 +128,11 @@ const applyManualChanges = () => {
             existingEntity.properties = Array.from(new Set(existingEntity.properties)).sort()
             entityMap[corp] = existingEntity
         } else {
-            let newEntity = {aliases: aliases, properties: [], displayName: displayName}
+            const newEntity = {
+                aliases,
+                properties: [],
+                displayName
+            }
             // check if domains previously belonged to different entity.
             // if they did, converge other entity into this one
             for (const item in domains) {
@@ -145,8 +146,8 @@ const applyManualChanges = () => {
                 const previousName = domainMap[domain] && domainMap[domain].entityName
 
                 if (previousName) {
-                    let previousEntity = entityMap[previousName]
-                    if (!previousEntity) continue
+                    const previousEntity = entityMap[previousName]
+                    if (!previousEntity) {continue} // eslint-disable-line max-depth
 
                     newEntity.aliases = newEntity.aliases.concat(previousEntity.aliases)
                     newEntity.properties = newEntity.properties.concat(previousEntity.properties)
@@ -164,12 +165,12 @@ const applyManualChanges = () => {
 }
 
 const generateDomainMap = updatedEntityMap => {
-    let sortedDomainMap = {}
+    const sortedDomainMap = {}
     for (const name in updatedEntityMap) {
         const entity = updatedEntityMap[name]
         entity.properties.forEach(d => {
             if (sortedDomainMap[d]) {
-                throw `[ALERT] ${d} has multiple owners: ${sortedDomainMap[d].entityName} and ${name}. Choose one, update entity_map.json and try again.`
+                throw new Error(`[ALERT] ${d} has multiple owners: ${sortedDomainMap[d].entityName} and ${name}. Choose one, update entity_map.json and try again.`)
             }
             sortedDomainMap[d] = {entityName: name, aliases: entity.aliases, displayName: entity.displayName}
         })
@@ -183,7 +184,7 @@ const exportEntities = updatedEntityMap => {
     const filenames = fs.readdirSync(`${entityDir}`)
     for (const item in filenames) {
         const file = filenames[item]
-        if (file[0] === ".") { continue }
+        if (file[0] === ".") {continue}
         const contents = fs.readFileSync(`${entityDir}/${file}`)
         const jsonContent = JSON.parse(contents)
         const entityName = jsonContent.name
@@ -202,7 +203,7 @@ const exportEntities = updatedEntityMap => {
             }
         }
     }
-    for (let entity in updatedEntityMap) {
+    for (const entity in updatedEntityMap) {
         const entityData = updatedEntityMap[entity]
         const shortName = entityData.displayName || ''
         const domains = entityData.properties.sort()
