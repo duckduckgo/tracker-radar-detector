@@ -25,6 +25,10 @@ class SharedData {
         this.breaking = _getBreaking(`${build}/static/breaking`)
         this.topExampleSitesSet = _getTopExampleSites(cfg)
         this.nameservers = NameServers
+
+        if (this.config.nameserverMapLoc) {
+            this.nameserverMap = _getJSON(this.config.nameserverMapLoc)
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 const tldts = require('tldts-experimental')
+const fs = require('fs')
 
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
@@ -145,8 +146,38 @@ async function _processRequest (requestData, site) {
     if (!site.isFirstParty(request.url)) {
         const nameservers = await shared.nameservers.resolveNs(request.domain)
 
-        if (nameservers) {
+        if (nameservers && nameservers.length) {
             request.nameservers = nameservers
+
+            if (shared.nameserverMap) {
+                let nsMatch
+
+                shared.nameserverMap.some(nsEntry => {
+                    const entityNS = new Set(nsEntry.nameservers)
+                    // all nameservers must match
+                    const nsDiff = request.nameservers.filter(x => !entityNS.has(x))
+                
+                    if (nsDiff && nsDiff.length === 0) {
+                        nsMatch = nsEntry
+                    }
+                    return nsDiff === 0
+                })
+
+                if (nsMatch) {
+                    const entityFile = `${shared.config.trackerDataLoc}/entities/${nsMatch.name}.json`
+                    const entityData = JSON.parse(fs.readFileSync(entityFile, 'utf-8'))
+                    
+                    if (!entityData.properties.includes(request.domain)) {
+                        entityData.properties.push(request.domain)
+                        fs.writeFileSync(entityFile, JSON.stringify(entityData, null, 4))
+                        console.log(request.domain)
+                    console.log(request.nameservers)
+                    
+                    }
+
+                    request.owner = nsMatch.name
+                }
+            }
         }
     }
 
