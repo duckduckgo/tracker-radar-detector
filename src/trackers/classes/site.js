@@ -149,12 +149,14 @@ async function _processRequest (requestData, site) {
         if (nameservers && nameservers.length) {
             request.nameservers = nameservers
 
+            // option to group by nameservers is set in the config
             if (shared.nameserverMap) {
                 let nsMatch
 
                 shared.nameserverMap.some(nsEntry => {
                     const entityNS = new Set(nsEntry.nameservers)
-                    // all nameservers must match
+                    
+                    // all nameservers in set must match
                     const nsDiff = request.nameservers.filter(x => !entityNS.has(x))
                 
                     if (nsDiff && nsDiff.length === 0) {
@@ -163,6 +165,7 @@ async function _processRequest (requestData, site) {
                     return nsDiff === 0
                 })
 
+                // if a match was found, update the entity property list
                 if (nsMatch) {
                     const entityFile = `${shared.config.trackerDataLoc}/entities/${nsMatch.name}.json`
                     const entityData = JSON.parse(fs.readFileSync(entityFile, 'utf-8'))
@@ -170,9 +173,6 @@ async function _processRequest (requestData, site) {
                     if (!entityData.properties.includes(request.domain)) {
                         entityData.properties.push(request.domain)
                         fs.writeFileSync(entityFile, JSON.stringify(entityData, null, 4))
-                        console.log(request.domain)
-                    console.log(request.nameservers)
-                    
                     }
 
                     request.owner = nsMatch.name
