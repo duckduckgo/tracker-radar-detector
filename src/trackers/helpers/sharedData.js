@@ -28,7 +28,7 @@ class SharedData {
 
         if (this.config.nameserverMapLoc) {
             const nameserverData = _getJSON(this.config.nameserverMapLoc)
-            if (nameserverData) {
+            if (nameserverData && nameserverData.length) {
                 this.nameserverMap = nameserverData
             }
         }
