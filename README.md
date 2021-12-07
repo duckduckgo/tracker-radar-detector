@@ -49,6 +49,8 @@ Database details should be provided via environment variables, for example with 
 ```
 envdir /etc/ddg/dbenv/tracker_radar_readonly/ npm run build
 ```
+See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
+
 ### Nameserver mapping file
 
 To assign entity/domain ownership using groups of nameservers you can provide a nameserver mapping file.
@@ -67,8 +69,6 @@ The format of the nameserver map is:
     }
 ]
 ```
-
-See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
 
 ## Contributing
 
