@@ -17,7 +17,7 @@ To generate a Tracker Radar data set follow these steps:
 |trackerDataLoc|path to your Tracker Radar data repository|
 |crawlerDataLoc|path to your crawler data directory|
 |performanceDataLoc|path to your performance crawler data|
-|nameserverMapLoc|path to your namserver to entity mapping file||
+|nameserverMapLoc|path to your namserver to entity mapping file|
 
 ## Generating Tracker Radar data
 
@@ -48,6 +48,21 @@ Database details should be provided via environment variables, for example with 
 
 ```
 envdir /etc/ddg/dbenv/tracker_radar_readonly/ npm run build
+```
+### Nameserver mapping file
+
+To assign entity/domain ownership using groups of nameservers you can provide a nameserver mapping file. The entity name should match the name of the entity found in the corresponding Tracker Radar `/entities` file.
+
+The format of the nameserver map is:
+
+```
+{
+    ENTITY-NAME : [
+            nameserver1,
+            nameserver2,
+            ...
+        ]
+}
 ```
 
 See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
