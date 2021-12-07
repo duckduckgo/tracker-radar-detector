@@ -136,6 +136,21 @@ function isRootSite(request, site) {
 }
 
 /**
+ * Add domain to entity property list when nameserver match is found. 
+ * @param {string} entityName - entity file name to update
+ * @param {string} domain - domain name to add to the entity properties list
+ */
+function _updateEntityProperties (entityName, domain) {
+    const entityFile = `${shared.config.trackerDataLoc}/entities/${entityName}.json`
+    const entityData = JSON.parse(fs.readFileSync(entityFile, 'utf-8'))
+
+    if (!entityData.properties.includes(domain)) {
+        entityData.properties.push(domain)
+        fs.writeFileSync(entityFile, JSON.stringify(entityData, null, 4))
+    }
+}
+
+/**
  *  Process a single request, resolve CNAME's (if any)
  *  @param {Object} requestData - The raw request data
  *  @param {Site} site - the current site object
@@ -167,14 +182,7 @@ async function _processRequest (requestData, site) {
 
                 // if a match was found, update the entity property list
                 if (nsMatch) {
-                    const entityFile = `${shared.config.trackerDataLoc}/entities/${nsMatch.name}.json`
-                    const entityData = JSON.parse(fs.readFileSync(entityFile, 'utf-8'))
-                    
-                    if (!entityData.properties.includes(request.domain)) {
-                        entityData.properties.push(request.domain)
-                        fs.writeFileSync(entityFile, JSON.stringify(entityData, null, 4))
-                    }
-
+                    _updateEntityProperties(nsMatch.name, request.domain)
                     request.owner = nsMatch.name
                 }
             }
