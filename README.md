@@ -51,18 +51,21 @@ envdir /etc/ddg/dbenv/tracker_radar_readonly/ npm run build
 ```
 ### Nameserver mapping file
 
-To assign entity/domain ownership using groups of nameservers you can provide a nameserver mapping file. The entity name should match the name of the entity found in the corresponding Tracker Radar `/entities` file.
+To assign entity/domain ownership using groups of nameservers you can provide a nameserver mapping file.
 
 The format of the nameserver map is:
 
 ```
-{
-    ENTITY-NAME : [
+[
+    {
+        "name": "entity name, must match name in Tracker Radar /entities file"
+        "nameservers": [
             nameserver1,
             nameserver2,
             ...
         ]
-}
+    }
+]
 ```
 
 See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
