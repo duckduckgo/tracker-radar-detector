@@ -17,6 +17,7 @@ To generate a Tracker Radar data set follow these steps:
 |trackerDataLoc|path to your Tracker Radar data repository|
 |crawlerDataLoc|path to your crawler data directory|
 |performanceDataLoc|path to your performance crawler data|
+|nameserverMapLoc|path to your namserver to entity mapping file||
 
 ## Generating Tracker Radar data
 
