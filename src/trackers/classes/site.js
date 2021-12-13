@@ -150,7 +150,6 @@ function _updateEntityProperties (entityName, domain) {
             const entityData = JSON.parse(data)
             if (!entityData.properties.includes(domain)) {
                 entityData.properties.push(domain)
-                console.log(domain)
                 fs.writeFile(entityFile, JSON.stringify(entityData, null, 4), writeError => {
                     if (writeError) {
                         console.error(writeError)
@@ -178,24 +177,18 @@ async function _processRequest (requestData, site) {
             // The option to group by nameservers is set in the config
             // All nameservers must match so we can do a quick check to see that the first nameserver exists in our data
             if (shared.nameserverList && shared.nameserverToEntity[request.nameservers[0]]) {
-                let nsMatch
-
                 for (const nsEntry of shared.nameserverList) {
                     const entityNS = new Set(nsEntry.nameservers)
                     
                     // all nameservers in set must match
                     const nsDiff = request.nameservers.filter(x => !entityNS.has(x))
                 
+                    // eslint-disable-next-line max-depth 
                     if (nsDiff && nsDiff.length === 0) {
-                        nsMatch = nsEntry
+                        _updateEntityProperties(nsEntry.name, request.domain)
+                        request.owner = nsEntry.name
                         break
                     }
-                }
-
-                // if a match was found, update the entity property list
-                if (nsMatch) {
-                    _updateEntityProperties(nsMatch.name, request.domain)
-                    request.owner = nsMatch.name
                 }
             }
         }
