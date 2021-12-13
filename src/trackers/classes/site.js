@@ -142,7 +142,6 @@ function isRootSite(request, site) {
  */
 function _updateEntityProperties (entityName, domain) {
     const entityFile = path.join(shared.config.trackerDataLoc, 'entities', `${entityName}.json`)
-    const entityData = JSON.parse(fs.readFileSync(entityFile, 'utf-8'))
 
     fs.readFile(entityFile, 'utf8', (readError, data) => {
         if (readError) {

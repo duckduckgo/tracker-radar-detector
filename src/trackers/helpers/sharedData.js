@@ -31,7 +31,9 @@ class SharedData {
             if (nameserverData && nameserverData.length) {
                 this.nameserverList = nameserverData
                 this.nameserverToEntity = nameserverData.reduce((obj, entityToNs) => {
-                    entityToNs.nameservers.forEach(ns => obj[ns] = entityToNs.name)
+                    entityToNs.nameservers.forEach(ns => {
+                        obj[ns] = entityToNs.name
+                    })
                     return obj
                 }, {})
             }
