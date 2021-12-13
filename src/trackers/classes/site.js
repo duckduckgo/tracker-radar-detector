@@ -1,6 +1,6 @@
 const tldts = require('tldts-experimental')
 const fs = require('fs')
-
+const path = require('path')
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
@@ -141,13 +141,25 @@ function isRootSite(request, site) {
  * @param {string} domain - domain name to add to the entity properties list
  */
 function _updateEntityProperties (entityName, domain) {
-    const entityFile = `${shared.config.trackerDataLoc}/entities/${entityName}.json`
+    const entityFile = path.join(shared.config.trackerDataLoc, 'entities', `${entityName}.json`)
     const entityData = JSON.parse(fs.readFileSync(entityFile, 'utf-8'))
 
-    if (!entityData.properties.includes(domain)) {
-        entityData.properties.push(domain)
-        fs.writeFileSync(entityFile, JSON.stringify(entityData, null, 4))
-    }
+    fs.readFile(entityFile, 'utf8', (readError, data) => {
+        if (readError) {
+            console.error(readError)
+        } else {
+            const entityData = JSON.parse(data)
+            if (!entityData.properties.includes(domain)) {
+                entityData.properties.push(domain)
+                console.log(domain)
+                fs.writeFile(entityFile, JSON.stringify(entityData, null, 4), writeError => {
+                    if (writeError) {
+                        console.error(writeError)
+                    }
+                })
+            }
+        }
+    })
 }
 
 /**
@@ -164,11 +176,12 @@ async function _processRequest (requestData, site) {
         if (nameservers && nameservers.length) {
             request.nameservers = nameservers
 
-            // option to group by nameservers is set in the config
-            if (shared.nameserverMap) {
+            // The option to group by nameservers is set in the config
+            // All nameservers must match so we can do a quick check to see that the first nameserver exists in our data
+            if (shared.nameserverList && shared.nameserverToEntity[request.nameservers[0]]) {
                 let nsMatch
 
-                shared.nameserverMap.some(nsEntry => {
+                shared.nameserverList.some(nsEntry => {
                     const entityNS = new Set(nsEntry.nameservers)
                     
                     // all nameservers in set must match
