@@ -51,11 +51,11 @@ envdir /etc/ddg/dbenv/tracker_radar_readonly/ npm run build
 ```
 See the [node-postgres documentation](https://node-postgres.com/features/connecting) for more details on connection options.
 
-### Nameserver mapping file
+### Nameserver list file
 
-To assign entity/domain ownership using groups of nameservers you can provide a nameserver mapping file.
+To assign entity/domain ownership using groups of nameservers you can provide a nameserver list file.
 
-The format of the nameserver map is:
+The format of the nameserver list is:
 
 ```
 [
