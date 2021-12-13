@@ -26,10 +26,14 @@ class SharedData {
         this.topExampleSitesSet = _getTopExampleSites(cfg)
         this.nameservers = NameServers
 
-        if (this.config.nameserverMapLoc) {
-            const nameserverData = _getJSON(this.config.nameserverMapLoc)
+        if (this.config.nameserverListLoc) {
+            const nameserverData = _getJSON(this.config.nameserverListLoc)
             if (nameserverData && nameserverData.length) {
-                this.nameserverMap = nameserverData
+                this.nameserverList = nameserverData
+                this.nameserverToEntity = nameserverData.reduce((obj, entityToNs) => {
+                    entityToNs.nameservers.forEach(ns => obj[ns] = entityToNs.name)
+                    return obj
+                }, {})
             }
         }
     }
