@@ -180,7 +180,7 @@ async function _processRequest (requestData, site) {
             if (shared.nameserverList && shared.nameserverToEntity[request.nameservers[0]]) {
                 let nsMatch
 
-                shared.nameserverList.some(nsEntry => {
+                for (const nsEntry of shared.nameserverList) {
                     const entityNS = new Set(nsEntry.nameservers)
                     
                     // all nameservers in set must match
@@ -188,9 +188,9 @@ async function _processRequest (requestData, site) {
                 
                     if (nsDiff && nsDiff.length === 0) {
                         nsMatch = nsEntry
+                        break
                     }
-                    return nsDiff === 0
-                })
+                }
 
                 // if a match was found, update the entity property list
                 if (nsMatch) {
