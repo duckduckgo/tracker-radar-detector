@@ -25,6 +25,19 @@ class SharedData {
         this.breaking = _getBreaking(`${build}/static/breaking`)
         this.topExampleSitesSet = _getTopExampleSites(cfg)
         this.nameservers = NameServers
+
+        if (this.config.nameserverListLoc) {
+            const nameserverData = _getJSON(this.config.nameserverListLoc)
+            if (nameserverData && nameserverData.length) {
+                this.nameserverList = nameserverData
+                this.nameserverToEntity = nameserverData.reduce((obj, entityToNs) => {
+                    entityToNs.nameservers.forEach(ns => {
+                        obj[ns] = entityToNs.name
+                    })
+                    return obj
+                }, {})
+            }
+        }
     }
 }
 

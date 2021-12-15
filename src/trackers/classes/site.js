@@ -1,5 +1,6 @@
 const tldts = require('tldts-experimental')
-
+const fs = require('fs')
+const path = require('path')
 const Request = require('./request.js')
 const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
@@ -135,6 +136,31 @@ function isRootSite(request, site) {
 }
 
 /**
+ * Add domain to entity property list when nameserver match is found. 
+ * @param {string} entityName - entity file name to update
+ * @param {string} domain - domain name to add to the entity properties list
+ */
+function _updateEntityProperties (entityName, domain) {
+    const entityFile = path.join(shared.config.trackerDataLoc, 'entities', `${entityName}.json`)
+
+    fs.readFile(entityFile, 'utf8', (readError, data) => {
+        if (readError) {
+            console.error(readError)
+        } else {
+            const entityData = JSON.parse(data)
+            if (!entityData.properties.includes(domain)) {
+                entityData.properties.push(domain)
+                fs.writeFile(entityFile, JSON.stringify(entityData, null, 4), writeError => {
+                    if (writeError) {
+                        console.error(writeError)
+                    }
+                })
+            }
+        }
+    })
+}
+
+/**
  *  Process a single request, resolve CNAME's (if any)
  *  @param {Object} requestData - The raw request data
  *  @param {Site} site - the current site object
@@ -145,8 +171,26 @@ async function _processRequest (requestData, site) {
     if (!site.isFirstParty(request.url)) {
         const nameservers = await shared.nameservers.resolveNs(request.domain)
 
-        if (nameservers) {
+        if (nameservers && nameservers.length) {
             request.nameservers = nameservers
+
+            // The option to group by nameservers is set in the config
+            // All nameservers must match so we can do a quick check to see that the first nameserver exists in our data
+            if (shared.nameserverList && shared.nameserverToEntity[request.nameservers[0]]) {
+                for (const nsEntry of shared.nameserverList) {
+                    const entityNS = new Set(nsEntry.nameservers)
+                    
+                    // all nameservers in set must match
+                    const nsDiff = request.nameservers.filter(x => !entityNS.has(x))
+                
+                    // eslint-disable-next-line max-depth 
+                    if (nsDiff && nsDiff.length === 0) {
+                        _updateEntityProperties(nsEntry.name, request.domain)
+                        request.owner = nsEntry.name
+                        break
+                    }
+                }
+            }
         }
     }
 
