@@ -20,13 +20,6 @@ const falsePositiveParams = ['not_a_param', 'a_param', 'notaparam', 'not_a', 'no
 const results = {}
 let totalSites = 0
 
-// process each site
-//
-// Cookies: look in savedCalls.each -> arguments.each -> regex match for fake param key
-//
-// Requests: Many of the requests have some kind of referrer id which has the full site URL indluding params
-//           this might be tracking but has less intent, so ignore these for now. Look for specific cases
-//           where only the fake param was added
 function run () {
     files.forEach(fileName => {
         const siteData = JSON.parse(fs.readFileSync(`${config.crawlerDataLoc}/${fileName}`, 'utf8'))
@@ -113,11 +106,13 @@ function processRequests (siteData, siteUrl) {
             return
         }
 
+        // process request paths, skip any that match one of the false positive parameters
         if (requestUrl.pathname && !hasFalsePositiveMatch(requestUrl.pathname)) {
             for (const [fakeParamKey, fakeParamValue] of crawlParams.params.entries()) {
                 const pathMatch = requestUrl.pathname.match(fakeParamValue)
                 if (pathMatch) {
                     countRequests(pathMatch[0], siteData.initialUrl, fakeParamKey, siteData.initialUrl)
+                    
                     //fallback to requestUrl if we don't know the owner
                     if (!requestOwner) {
                         requestOwner = {entityName: requestUrl.hostname}
@@ -127,6 +122,7 @@ function processRequests (siteData, siteUrl) {
             }
         }
 
+        // process request parameters
         for (const [key, val] of requestUrl.searchParams.entries()) {
             if (!(key && val)) {
                 continue
@@ -134,7 +130,6 @@ function processRequests (siteData, siteUrl) {
 
             // skip any value that has an exact match to our full param string. this will miss values that contain the full param string and
             // additional fake parameters added in. i.e  tracker.com/?fakeKey=fakeVal&extraTrackyParam=fakeval
-            // probably okay for now
             if (val.match(crawlParams.paramString) || val.match(crawlParams.paramStringEncoded)) {
                 continue
             }
@@ -142,6 +137,7 @@ function processRequests (siteData, siteUrl) {
             for (const [fakeParamKey, fakeParamValue] of crawlParams.params.entries()) {
                 if (val.match(fakeParamValue) && !hasFalsePositiveMatch(val)) {
                     countRequests(`${key}=${val}`, siteData.initialUrl, fakeParamKey, siteUrl)
+                    
                     //fallback to requestUrl if we don't know the owner
                     if (!requestOwner) {
                         requestOwner = {entityName: requestUrl.hostname}
@@ -186,9 +182,10 @@ function getPlaceholder () {
     }
 }
 
+// Count first and third party cookies
 function countCookies (cookie, siteUrl, param) {
     if (!results[param]) {
-        results[param] = getPlaceholder(param)
+        results[param] = getPlaceholder()
     }
 
     results[param].cookies.cookieValues[cookie] ? results[param].cookies.cookieValues[cookie]++ : results[param].cookies.cookieValues[cookie] = 1
@@ -227,13 +224,14 @@ function countCookies (cookie, siteUrl, param) {
     }
 }
 
-function countRequests (request, site, param, siteUrl) {
+// Count unique third party requests
+function countRequests (reqKey, site, param, siteUrl) {
     if (!results[param]) {
-        results[param] = getPlaceholder(param)
+        results[param] = getPlaceholder()
     }
 
     // collect all requests
-    results[param].requests3p.requestValues[request] ? results[param].requests3p.requestValues[request]++ : results[param].requests3p.requestValues[request] = 1
+    results[param].requests3p.requestValues[reqKey] ? results[param].requests3p.requestValues[reqKey]++ : results[param].requests3p.requestValues[reqKey] = 1
 
     if (!results[param].requests3p.requestSites.includes(siteUrl.hostname)) {
         results[param].requests3p.requestSites.push(siteUrl.hostname)
