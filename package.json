@@ -13,6 +13,7 @@
     "chalk": "^2.4.1",
     "child_process": "^1.0.2",
     "commander": "^2.19.0",
+    "cookie": "^0.4.1",
     "csv-parse": "^4.4.3",
     "d3-array": "^2.0.3",
     "fs-extra": "^8.0.1",
@@ -34,6 +35,7 @@
   },
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=8096 ./src/trackers/process-crawl.js && ./src/trackers/build-trackers.js",
+    "process-params": "node src/trackers/trackingParams.js",
     "process-crawl": "./src/trackers/process-crawl.js",
     "build-trackers": "./src/trackers/build-trackers.js",
     "build-performance": "./src/performance/group_data.js && ./src/performance/create_stats.js",
