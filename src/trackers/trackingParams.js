@@ -292,6 +292,11 @@ function setCrawlParams (site) {
 // - get a list of top entities
 // - remove false positive param
 function cleanupFinalData () {
+    let topExampleSites = ''
+    if (config.topExampleSites) {
+        topExampleSites = new Set(JSON.parse(fs.readFileSync(config.topExampleSites, 'utf-8')))
+    }
+
     for (const param of Object.keys(results)) {
         if (results[param].cookies) {
             delete results[param].cookies.cookieSites
@@ -304,7 +309,13 @@ function cleanupFinalData () {
         }
 
         results[param].prevalence = +(results[param].exampleSites.length / totalSites).toFixed(3)
-        results[param].exampleSites = _shuffleList(results[param].exampleSites, 10)
+
+        if (topExampleSites) {
+            const topParamSites = getTopExampleSites(results[param].exampleSites, topExampleSites)
+            results[param].exampleSites = _shuffleList(topParamSites, 10).map(x => x.replace(/\/$/, ''))
+        } else {
+            results[param].exampleSites = _shuffleList(results[param].exampleSites, 10).map(x => x.replace(/\/$/, ''))
+        }
 
         results[param].requests3p.prevalence = +(results[param].requests3p.prevalence / totalSites).toFixed(3)
         results[param].cookies.prevalence = +(results[param].cookies.prevalence / totalSites).toFixed(3)
@@ -352,4 +363,12 @@ function _shuffleList (list, numResults) {
     }
 
     return shuffledList
+}
+
+// Intersetion between exampleSites and topExampleSites
+function getTopExampleSites (paramSites, topSitesSet) {
+    return paramSites.filter((url) => {
+        const x = new URL('http://' + url)
+        return topSitesSet.has(x.domain)
+    })
 }
