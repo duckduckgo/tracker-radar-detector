@@ -45,6 +45,7 @@ function run () {
         totalSites++
     })
 
+
     cleanupFinalData(results)
     fs.writeFileSync(`${config.trackerDataLoc}/build-data/generated/tracking_parameters.json`, JSON.stringify({totalSites, params: results}, null, 4))
 
@@ -54,6 +55,10 @@ run()
 
 // Look though the site 'call.arguments' data, count first and third party cookies
 function processCookies (siteData, siteUrl) {
+    if (!(siteData.data && siteData.data.apis && siteData.data.apis.savedCalls)) {
+        return
+    }
+
     siteData.data.apis.savedCalls.forEach(call => {
         
         if (!(call.arguments && call.arguments.length)) {
@@ -190,8 +195,10 @@ function countCookies (cookie, siteUrl, param) {
 
     results[param].cookies.cookieValues[cookie] ? results[param].cookies.cookieValues[cookie]++ : results[param].cookies.cookieValues[cookie] = 1
 
-    if (!results[param].cookies.cookieSites.includes(siteUrl.hostname)) {
-        results[param].cookies.cookieSites.push(siteUrl.hostname)
+    const siteKey = siteUrl.hostname + siteUrl.path
+
+    if (!results[param].cookies.cookieSites.includes(siteKey)) {
+        results[param].cookies.cookieSites.push(siteKey)
         results[param].cookies.prevalence++
     }
 
@@ -219,8 +226,8 @@ function countCookies (cookie, siteUrl, param) {
         }
     }
 
-    if (!results[param].exampleSites.includes(siteUrl.hostname)) {
-        results[param].exampleSites.push(siteUrl.hostname)
+    if (!results[param].exampleSites.includes(siteKey)) {
+        results[param].exampleSites.push(siteKey)
     }
 }
 
@@ -230,16 +237,18 @@ function countRequests (reqKey, site, param, siteUrl) {
         results[param] = getPlaceholder()
     }
 
+    const siteKey = siteUrl.hostname + siteUrl.path
+
     // collect all requests
     results[param].requests3p.requestValues[reqKey] ? results[param].requests3p.requestValues[reqKey]++ : results[param].requests3p.requestValues[reqKey] = 1
 
-    if (!results[param].requests3p.requestSites.includes(siteUrl.hostname)) {
-        results[param].requests3p.requestSites.push(siteUrl.hostname)
+    if (!results[param].requests3p.requestSites.includes(siteKey)) {
+        results[param].requests3p.requestSites.push(siteKey)
         results[param].requests3p.prevalence++
     }
 
-    if (!results[param].exampleSites.includes(siteUrl.hostname)) {
-        results[param].exampleSites.push(siteUrl.hostname)
+    if (!results[param].exampleSites.includes(siteKey)) {
+        results[param].exampleSites.push(siteKey)
     }
 }
 
