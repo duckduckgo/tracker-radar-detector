@@ -309,6 +309,12 @@ function cleanupFinalData () {
         }
 
         results[param].prevalence = +(results[param].exampleSites.length / totalSites).toFixed(3)
+        results[param].requests3p.prevalence = +(results[param].requests3p.prevalence / totalSites).toFixed(3)
+        results[param].cookies.prevalence = +(results[param].cookies.prevalence / totalSites).toFixed(3)
+
+        // calculate percents for entities
+        results[param].cookies.entities = getTopEntities(results[param].cookies.entities)
+        results[param].requests3p.entities = getTopEntities(results[param].requests3p.entities)
 
         if (topExampleSites) {
             const topParamSites = getTopExampleSites(results[param].exampleSites, topExampleSites)
@@ -317,12 +323,6 @@ function cleanupFinalData () {
             results[param].exampleSites = _shuffleList(results[param].exampleSites, 10).map(x => x.replace(/\/$/, ''))
         }
 
-        results[param].requests3p.prevalence = +(results[param].requests3p.prevalence / totalSites).toFixed(3)
-        results[param].cookies.prevalence = +(results[param].cookies.prevalence / totalSites).toFixed(3)
-
-        // calculate percents for entities
-        results[param].cookies.entities = getTopEntities(results[param].cookies.entities)
-        results[param].requests3p.entities = getTopEntities(results[param].requests3p.entities)
 
     }
     
