@@ -17,6 +17,20 @@ const crawlParams = {
 // The first value in the list is the expected param, the others are altered versions that were found in manual testing.
 const falsePositiveParams = ['not_a_param', 'a_param', 'notaparam', 'not_a', 'not%20a%20param', 'not a param']
 
+// Results object will store our final param data. The format is
+// {
+//    <param> : {
+//          prevalence: percent of totalSites that the param was seen on
+//          exampleSites: list of top sites using the param in cookies or requests
+//          cookies: 
+//              firstParty: count of first party cookies this param was seen in
+//              thirdParty: count of third party cookies this param was seen in
+//              prevalence: percent of totalSites where the param was set in a cookie
+//              entities: top 10 entities using this param in cookies
+//          requests3p:
+//              prevalence: percent of totalSites where the param was seen in a third party request
+//              entities: top 10 entities using this param in requests
+//    }
 const results = {}
 let totalSites = 0
 
