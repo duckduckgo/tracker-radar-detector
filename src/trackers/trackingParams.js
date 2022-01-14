@@ -2,7 +2,7 @@ const fs = require('fs')
 const URL = require('./helpers/url.js')
 const config = require('../../config.json')
 // read file list, shuffle, and option to slice into a smaller list of testing
-const files = _shuffleList(fs.readdirSync(config.crawlerDataLoc))
+const files = _shuffleList(fs.readdirSync(config.crawlerDataLoc), 1000)
 const cookieParser = require('cookie')
 const domainMap = require(`${config.trackerDataLoc}/build-data/generated/domain_map.json`)
 
@@ -80,6 +80,7 @@ function processCookies (siteData, siteUrl) {
         }
 
         if (typeof call.arguments === 'string') {
+            console.log(call.arguments)
             call.arguments = JSON.parse(call.arguments)
         }
 
@@ -87,7 +88,7 @@ function processCookies (siteData, siteUrl) {
         call.arguments.forEach(arg => {
             const argMatches = []
             for (const [param, value] of crawlParams.params.entries()) {
-                if (arg.match(value) && !hasFalsePositiveMatch(arg)) {
+                if (arg.includes(value) && !hasFalsePositiveMatch(arg)) {
                     argMatches.push({arg, param})
                 }
             }
@@ -128,7 +129,7 @@ function processRequests (siteData, siteUrl) {
         // process request paths, skip any that match one of the false positive parameters
         if (requestUrl.pathname && !hasFalsePositiveMatch(requestUrl.pathname)) {
             for (const [fakeParamKey, fakeParamValue] of crawlParams.params.entries()) {
-                const pathMatch = requestUrl.pathname.match(fakeParamValue)
+                const pathMatch = requestUrl.pathname.includes(fakeParamValue)
                 if (pathMatch) {
                     countRequests(pathMatch[0], siteData.initialUrl, fakeParamKey, siteData.initialUrl)
                     
@@ -149,12 +150,12 @@ function processRequests (siteData, siteUrl) {
 
             // skip any value that has an exact match to our full param string. this will miss values that contain the full param string and
             // additional fake parameters added in. i.e  tracker.com/?fakeKey=fakeVal&extraTrackyParam=fakeval
-            if (val.match(crawlParams.paramString) || val.match(crawlParams.paramStringEncoded)) {
+            if (val.includes(crawlParams.paramString) || val.includes(crawlParams.paramStringEncoded)) {
                 continue
             }
 
             for (const [fakeParamKey, fakeParamValue] of crawlParams.params.entries()) {
-                if (val.match(fakeParamValue) && !hasFalsePositiveMatch(val)) {
+                if (val.includes(fakeParamValue) && !hasFalsePositiveMatch(val)) {
                     countRequests(`${key}=${val}`, siteData.initialUrl, fakeParamKey, siteUrl)
                     
                     //fallback to requestUrl if we don't know the owner
@@ -173,7 +174,7 @@ function processRequests (siteData, siteUrl) {
 // see if the false postive param matches
 function hasFalsePositiveMatch (paramValue) {
     for (const fpVal of falsePositiveParams) {
-        if (paramValue.match(fpVal)) {
+        if (paramValue.includes(fpVal)) {
             return true
         }
     }
@@ -220,7 +221,7 @@ function countCookies (cookie, siteUrl, param) {
     const parsedCookie = cookieParser.parse(cookie)
     if (parsedCookie.domain) {
         // same domain and 'auto' cookie are 1p
-        if (!(siteUrl.domain.match(parsedCookie.domain) || parsedCookie.domain === 'auto')) {
+        if (!(siteUrl.domain.includes(parsedCookie.domain) || parsedCookie.domain === 'auto')) {
             results[param].cookies.thirdParty++
             // count entities for 3p cookies
             let cookieDomainUrl = ''
