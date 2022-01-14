@@ -365,7 +365,7 @@ function _shuffleList (list, numResults) {
     return shuffledList
 }
 
-// Intersetion between exampleSites and topExampleSites
+// Intersection between parameter sites and topExampleSites
 function getTopExampleSites (paramSites, topSitesSet) {
     return paramSites.filter(url => {
         const x = new URL('http://' + url)
