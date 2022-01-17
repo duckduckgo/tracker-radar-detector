@@ -2,7 +2,7 @@ const fs = require('fs')
 const URL = require('./helpers/url.js')
 const config = require('../../config.json')
 // read file list, shuffle, and option to slice into a smaller list of testing
-const files = _shuffleList(fs.readdirSync(config.crawlerDataLoc), 1000)
+const files = _shuffleList(fs.readdirSync(config.crawlerDataLoc))
 const cookieParser = require('cookie')
 const domainMap = require(`${config.trackerDataLoc}/build-data/generated/domain_map.json`)
 
@@ -69,7 +69,7 @@ run()
 
 // Look though the site 'call.arguments' data, count first and third party cookies
 function processCookies (siteData, siteUrl) {
-    if (!(siteData.data && siteData.data.apis && siteData.data.apis.savedCalls)) {
+    if (!siteData.data?.apis?.savedCalls) {
         return
     }
 
@@ -80,7 +80,6 @@ function processCookies (siteData, siteUrl) {
         }
 
         if (typeof call.arguments === 'string') {
-            console.log(call.arguments)
             call.arguments = JSON.parse(call.arguments)
         }
 
@@ -138,6 +137,7 @@ function processRequests (siteData, siteUrl) {
                         requestOwner = {entityName: requestUrl.hostname}
                     }
                     countEntities(requestUrl, fakeParamKey, requestOwner, 'requests3p')
+                    countDomains(requestUrl, fakeParamKey, requestUrl.domain, 'requests3p')
                 }
             }
         }
@@ -164,6 +164,7 @@ function processRequests (siteData, siteUrl) {
                     }
 
                     countEntities(requestUrl, fakeParamKey, requestOwner, 'requests3p')
+                    countDomains(requestUrl, fakeParamKey, requestUrl.domain, 'requests3p')
                 }
             }
         }
@@ -188,6 +189,7 @@ function getPlaceholder () {
         requests3p: {
             prevalence: 0,
             entities: {},
+            domains: {},
             requestSites: [],
             requestValues: {}
         },
@@ -196,6 +198,7 @@ function getPlaceholder () {
             firstParty: 0,
             thirdParty: 0,
             entities: {},
+            domains: {},
             cookieSites: [],
             cookieValues: {}
         }
@@ -220,8 +223,10 @@ function countCookies (cookie, siteUrl, param) {
     // look for 1p 3p cookies
     const parsedCookie = cookieParser.parse(cookie)
     if (parsedCookie.domain) {
+        parsedCookie.domain = parsedCookie.domain.replace(/^\./, '')
+
         // same domain and 'auto' cookie are 1p
-        if (!(siteUrl.domain.includes(parsedCookie.domain) || parsedCookie.domain === 'auto')) {
+        if (!(siteUrl.domain === parsedCookie.domain || siteUrl.domain.endsWith('.' + parsedCookie.domain) || parsedCookie.domain === 'auto')) {
             results[param].cookies.thirdParty++
             // count entities for 3p cookies
             let cookieDomainUrl = ''
@@ -236,6 +241,7 @@ function countCookies (cookie, siteUrl, param) {
 
             const cookieOwner = _getEntity(cookieDomainUrl)
             countEntities(siteUrl, param, cookieOwner || {entityName: cookieDomainUrl.hostname}, 'cookies')
+            countDomains(siteUrl, param, parsedCookie.domain, 'cookies')
         } else {
             results[param].cookies.firstParty++
         }
@@ -274,8 +280,20 @@ function countEntities (url, param, entity, key) {
     }
 }
 
+// count domains that set cookies or use url params
+function countDomains (url, param, domain, key) {
+    if (domain) {
+        results[param][key].domains[domain] ? results[param][key].domains[domain]++ : results[param][key].domains[domain] = 1
+    }
+}
+
 // crawl params are set off the first site we process. crawl params are assumed to be the same for all sites in the crawl. 
 function setCrawlParams (site) {
+    // check that parm string includes false positive param
+    if (!site.searchParams.has(falsePositiveParams[0])) {
+        return 
+    }
+
     if (!crawlParams.paramString) {
         crawlParams.params = site.searchParams
     }
@@ -314,8 +332,10 @@ function cleanupFinalData () {
         results[param].cookies.prevalence = +(results[param].cookies.prevalence / totalSites).toFixed(3)
 
         // calculate percents for entities
-        results[param].cookies.entities = getTopEntities(results[param].cookies.entities)
-        results[param].requests3p.entities = getTopEntities(results[param].requests3p.entities)
+        results[param].cookies.entities = getTopEntries(results[param].cookies.entities)
+        results[param].cookies.domains = getTopEntries(results[param].cookies.domains)
+        results[param].requests3p.entities = getTopEntries(results[param].requests3p.entities)
+        results[param].requests3p.domains = getTopEntries(results[param].requests3p.domains)
 
         if (topExampleSites) {
             const topParamSites = getTopExampleSites(results[param].exampleSites, topExampleSites)
@@ -332,18 +352,18 @@ function cleanupFinalData () {
     }
 }
 
-// Calculate entity percent and return sorted list of entities by percent 
-function getTopEntities(entities, numberOfEntities=10) {
-    const sortedEntityList = Object.entries(entities).sort((a,b) => {return b[1] - a[1]})
+// get top entries form key:val object
+function getTopEntries(entries, numberOfEntries=10) {
+    const sortedList = Object.entries(entries).sort((a,b) => {return b[1] - a[1]})
 
     // total for all entities used to calculate percent
-    const entityTotal = sortedEntityList.reduce((total, e) => {
+    const total = sortedList.reduce((total, e) => {
         total += e[1]
         return total
     }, 0)
 
-    return sortedEntityList.slice(0, numberOfEntities - 1).reduce((obj, e) => {
-        obj[e[0]] = +(e[1] / entityTotal).toFixed(3)
+    return sortedList.slice(0, numberOfEntries - 1).reduce((obj, e) => {
+        obj[e[0]] = +(e[1] / total).toFixed(3)
         return obj
     }, {})
 }
