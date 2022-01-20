@@ -28,9 +28,11 @@ const falsePositiveParams = ['not_a_param', 'a_param', 'notaparam', 'not_a', 'no
 //              thirdParty: count of third party cookies this param was seen in
 //              prevalence: percent of totalSites where the param was set in a cookie
 //              entities: top 10 entities using this param in cookies
+//              domains: top 10 domains using this param in cookies
 //          requests3p:
 //              prevalence: percent of totalSites where the param was seen in a third party request
 //              entities: top 10 entities using this param in requests
+//              domains: top 10 domains using this param in requests
 //    }
 const results = {}
 let totalSites = 0
