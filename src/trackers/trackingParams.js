@@ -1,10 +1,11 @@
 const fs = require('fs')
 const URL = require('./helpers/url.js')
 const config = require('../../config.json')
+const getOwner = require('./helpers/getOwner.js')
+
 // read file list, shuffle, and option to slice into a smaller list of testing
 const files = _shuffleList(fs.readdirSync(config.crawlerDataLoc))
 const cookieParser = require('cookie')
-const domainMap = require(`${config.trackerDataLoc}/build-data/generated/domain_map.json`)
 
 // collect url params seen in initialUrl
 const crawlParams = {
@@ -107,7 +108,7 @@ function processRequests (siteData, siteUrl) {
         return
     }
 
-    const siteOwner = _getEntity(siteUrl)
+    const siteOwner = getOwner(siteUrl.domain)
 
     siteData.data.requests.forEach(req => {
         let requestUrl
@@ -118,7 +119,7 @@ function processRequests (siteData, siteUrl) {
             return
         }
 
-        let requestOwner  = _getEntity(requestUrl)
+        let requestOwner  = getOwner(requestUrl.domain)
 
         // skip first party and same entity
         if (requestUrl.hostname === siteUrl.hostname || (siteOwner && (siteOwner === requestOwner))) {
@@ -126,7 +127,11 @@ function processRequests (siteData, siteUrl) {
         }
 
         // process request paths, skip any that match one of the false positive parameters
-        if (requestUrl.pathname && !hasFalsePositiveMatch(requestUrl.pathname)) {
+        if (requestUrl.pathname && !(hasFalsePositiveMatch(requestUrl.pathname) ||
+            requestUrl.pathname.includes(crawlParams.paramString) || 
+            requestUrl.pathname.includes(crawlParams.paramStringEncoded))
+        ){
+
             for (const [fakeParamKey, fakeParamValue] of crawlParams.params.entries()) {
                 const pathMatch = requestUrl.pathname.includes(fakeParamValue)
                 if (pathMatch) {
@@ -134,7 +139,7 @@ function processRequests (siteData, siteUrl) {
                     
                     //fallback to requestUrl if we don't know the owner
                     if (!requestOwner) {
-                        requestOwner = {entityName: requestUrl.hostname}
+                        requestOwner = requestUrl.hostname
                     }
                     countEntities(requestUrl, fakeParamKey, requestOwner, 'requests3p')
                     countDomains(requestUrl, fakeParamKey, requestUrl.domain, 'requests3p')
@@ -160,7 +165,7 @@ function processRequests (siteData, siteUrl) {
                     
                     //fallback to requestUrl if we don't know the owner
                     if (!requestOwner) {
-                        requestOwner = {entityName: requestUrl.hostname}
+                        requestOwner = requestUrl.hostname
                     }
 
                     countEntities(requestUrl, fakeParamKey, requestOwner, 'requests3p')
@@ -239,8 +244,8 @@ function countCookies (cookie, siteUrl, param) {
                 }
             }
 
-            const cookieOwner = _getEntity(cookieDomainUrl)
-            countEntities(siteUrl, param, cookieOwner || {entityName: cookieDomainUrl.hostname}, 'cookies')
+            const cookieOwner = getOwner(cookieDomainUrl.domain)
+            countEntities(siteUrl, param, cookieOwner || cookieDomainUrl.hostname, 'cookies')
             countDomains(siteUrl, param, parsedCookie.domain, 'cookies')
         } else {
             results[param].cookies.firstParty++
@@ -276,7 +281,7 @@ function countRequests (reqKey, site, param, siteUrl) {
 // count entities that set cookies or use url params
 function countEntities (url, param, entity, key) {
     if (entity) {
-        results[param][key].entities[entity.entityName] ? results[param][key].entities[entity.entityName]++ : results[param][key].entities[entity.entityName] = 1
+        results[param][key].entities[entity] ? results[param][key].entities[entity]++ : results[param][key].entities[entity] = 1
     }
 }
 
@@ -366,11 +371,6 @@ function getTopEntries(entries, numberOfEntries=10) {
         obj[e[0]] = +(e[1] / total).toFixed(3)
         return obj
     }, {})
-}
-
-// look up entity data based on domain
-function _getEntity(url) {
-    return domainMap[url.domain]
 }
 
 // Helper function to randomly shuffle a list and return an optional slice
