@@ -130,9 +130,9 @@ function processRequests (siteData, siteUrl) {
 
         // process request paths, skip any that match one of the false positive parameters
         if (requestUrl.pathname && !(hasFalsePositiveMatch(requestUrl.pathname) ||
-            requestUrl.pathname.includes(crawlParams.paramString) || 
+            requestUrl.pathname.includes(crawlParams.paramString) ||
             requestUrl.pathname.includes(crawlParams.paramStringEncoded))
-        ){
+        ) {
 
             for (const [fakeParamKey, fakeParamValue] of crawlParams.params.entries()) {
                 const pathMatch = requestUrl.pathname.includes(fakeParamValue)
@@ -298,7 +298,7 @@ function countDomains (url, param, domain, key) {
 function setCrawlParams (site) {
     // check that parm string includes false positive param
     if (!site.searchParams.has(falsePositiveParams[0])) {
-        return 
+        return
     }
 
     if (!crawlParams.paramString) {
@@ -364,9 +364,9 @@ function getTopEntries(entries, numberOfEntries=10) {
     const sortedList = Object.entries(entries).sort((a,b) => {return b[1] - a[1]})
 
     // total for all entities used to calculate percent
-    const total = sortedList.reduce((total, e) => {
-        total += e[1]
-        return total
+    const total = sortedList.reduce((sum, e) => {
+        sum += e[1]
+        return sum
     }, 0)
 
     return sortedList.slice(0, numberOfEntries - 1).reduce((obj, e) => {
