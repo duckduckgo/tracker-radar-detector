@@ -1,7 +1,8 @@
 const {URL} = require('@cliqz/url-parser')
 const {parse} = require('tldts-experimental')
 const {TLDTS_OPTIONS} = require('./const')
-
+const config = require('./../../../config.json')
+const pslExtras = config.pslExtras ? require(config.pslExtras) : {}
 
 class ParsedURL extends URL {
 
@@ -19,6 +20,19 @@ class ParsedURL extends URL {
                 extractHostname: false,
                 ...TLDTS_OPTIONS
             })
+
+            if (pslExtras) {
+                // reformat private psl
+                if (pslExtras.privatePSL.includes(this._domainInfo.domain)) {
+                    const splitSubdomain = this._domainInfo.subdomain.split('.')
+                    const domainWithoutSuffix = splitSubdomain.pop()
+                    this._domainInfo.publicSuffix = this._domainInfo.domain
+                    this._domainInfo.domain = `${domainWithoutSuffix}.${this._domainInfo.domain}`
+                    this._domainInfo.domainWithoutSuffix = domainWithoutSuffix
+                    this._domainInfo.subdomain = splitSubdomain.join('.')
+                    this._domainInfo.isPrivate = true
+                }
+            }
         }
         return this._domainInfo
     }
