@@ -1,8 +1,9 @@
 const {URL} = require('@cliqz/url-parser')
+const fs = require('fs')
 const {parse} = require('tldts-experimental')
 const {TLDTS_OPTIONS} = require('./const')
 const config = require('./../../../config.json')
-const pslExtras = config.pslExtras ? require(config.pslExtras) : {}
+const pslExtras = config.pslExtras ? JSON.parse(fs.readFileSync(config.pslExtras, 'utf8')) : {}
 
 class ParsedURL extends URL {
 
