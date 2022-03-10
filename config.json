@@ -6,7 +6,6 @@
     "performanceDataLoc": "path to your 3rd party performance directory",
     "nameserverListLoc": "path to name server grouping file",
     "crawlId": "",
-    "pslExtras": "optional path to your psl extras file, or use <tracker radar repo>/build-data/static/pslExtras.json",
     "regionCode": "US",
     "flags": {
         "addSurrogates": false
