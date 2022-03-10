@@ -21,13 +21,25 @@ class ParsedURL extends URL {
                 ...TLDTS_OPTIONS
             })
 
-            if (pslExtras) {
-                // reformat private psl
-                if (pslExtras.privatePSL.includes(this._domainInfo.domain)) {
-                    const splitSubdomain = this._domainInfo.subdomain.split('.')
+            if (!this._domainInfo.isPrivate && pslExtras && pslExtras.privatePSL) {
+                // get list of possible suffix matches, we can have multiple matches for a single request
+                // a.example.com and b.a.example.com for a request from 123.b.a.example.com
+                const suffixMatches = pslExtras.privatePSL.filter(suffix => this._domainInfo.hostname.match(suffix))
+
+                // reformat domainInfo to make this request look like a private domain
+                if (suffixMatches && suffixMatches.length) {
+
+                    // use most specific suffix match (longest)
+                    const suffix = suffixMatches.reduce((l,s) => {
+                        return l.length >= s.length ? l : s
+                    })
+                    
+                    // Array of subdomain after removing suffix from hostname
+                    const splitSubdomain = this._domainInfo.hostname.replace(suffix, '').replace(/\.$/,'').split('.')
                     const domainWithoutSuffix = splitSubdomain.pop()
-                    this._domainInfo.publicSuffix = this._domainInfo.domain
-                    this._domainInfo.domain = `${domainWithoutSuffix}.${this._domainInfo.domain}`
+
+                    this._domainInfo.publicSuffix = suffix
+                    this._domainInfo.domain = `${domainWithoutSuffix}.${suffix}`
                     this._domainInfo.domainWithoutSuffix = domainWithoutSuffix
                     this._domainInfo.subdomain = splitSubdomain.join('.')
                     this._domainInfo.isPrivate = true
