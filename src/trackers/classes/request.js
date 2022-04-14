@@ -57,7 +57,7 @@ function _getFPScore (apis) {
 }
 
 function _setsCookies (req) {
-    if (req.apis['Document.cookie setter'] || req.headers['set-cookie']) {
+    if (req.apis['Document.cookie setter'] || req.apis['CookieStore.prototype.set'] || req.headers['set-cookie']) {
         return true
     }
     return false
