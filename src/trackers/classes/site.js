@@ -119,6 +119,12 @@ function _analyzeRequest(request, site) {
     if (request.wasCNAME) {
         site.uniqueDomains[request.domain].usesCNAMECloaking = true
     }
+
+    if (request.initiator) {
+        site.uniqueDomains[request.domain].initiators = site.uniqueDomains[request.domain].initiators || {}
+        site.uniqueDomains[request.domain].initiators[request.initiator] = site.uniqueDomains[request.domain].initiators[request.initiator] || 0
+        site.uniqueDomains[request.domain].initiators[request.initiator]++
+    }
 }
 
 /**
