@@ -181,18 +181,20 @@ function _getDomainSummaries (crawl) {
         let requests = 0
         let top = []
 
-        Object.keys(crawl.domainInitiators).forEach(init => {
-            requests += crawl.domainInitiators[init]
+        Object.keys(crawl.domainInitiators[domain]).forEach(init => {
+            requests += crawl.domainInitiators[domain][init]
         })
 
         // transform to [{domain: initiator.com, prevalence: 0.1}] where prevalence is calculated for all requests
-        Object.keys(crawl.domainInitiators).forEach(init => {
-            top.push({domain: init, prevalence: crawl.domainInitiators[init] / requests})
+        Object.keys(crawl.domainInitiators[domain]).forEach(init => {
+            top.push({domain: init, prevalence: crawl.domainInitiators[domain][init] / requests})
         })
 
         // sort by prevalence, get top 10
         top = top.sort((a, b) => b.prevalence - a.prevalence)
-        top.length = 10
+        if (top.length > 10) {
+            top.length = 10
+        }
 
         domainSummary[domain].topInitiators = top
     })
