@@ -69,6 +69,24 @@
     ],
     "requests": [
       {
+        "url": "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ",
+        "method": "GET",
+        "type": "Script",
+        "status": 200,
+        "size": 37271,
+        "remoteIPAddress": "142.250.185.72",
+        "responseHeaders": {
+          "access-control-allow-origin": "*",
+          "cache-control": "private, max-age=900",
+          "expires": "Mon, 01 Feb 2021 14:07:14 GMT"
+        },
+        "responseBodyHash": "3ae72ef0d11e614d693f9ead74ee5060de4f92cacd142c8e888a6820ba346151",
+        "initiators": [
+          "https://test.example.com/test/"
+        ],
+        "time": 0.014581999137997627
+      },
+      {
         "url": "https://www.google-analytics.com/analytics.js",
         "method": "GET",
         "type": "Script",
@@ -81,7 +99,7 @@
         },
         "responseBodyHash": "e441c3e2771625ba05630ab464275136a82c99650ee2145ca5aa9853bedeb01b",
         "initiators": [
-          "https://test.example.com/en-US/firefox/"
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.016581999137997627
       },
@@ -100,7 +118,8 @@
         },
         "responseBodyHash": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.011511998251080513
       },
@@ -119,7 +138,8 @@
         },
         "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.01307000033557415
       },
@@ -138,7 +158,8 @@
         },
         "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.013325000181794167
       },
@@ -157,7 +178,8 @@
         },
         "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.015500999987125397
       },
@@ -176,7 +198,8 @@
         },
         "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.011066999286413193
       },
@@ -195,7 +218,8 @@
         },
         "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.010642999783158302
       },
@@ -214,7 +238,8 @@
         },
         "responseBodyHash": "8337212354871836e6763a41e615916c89bac5b3f1f0adf60ba43c7c806e1015",
         "initiators": [
-          "https://www.google-analytics.com/analytics.js"
+          "https://www.google-analytics.com/analytics.js",
+          "https://www.googletagmanager.com/gtm.js?id=GTM-ZZZ"
         ],
         "time": 0.01091800071299076
       },

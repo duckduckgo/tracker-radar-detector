@@ -2,6 +2,8 @@ const shared = require('./../helpers/sharedData.js')
 const URL = require('./../helpers/url.js')
 const getOwner = require('./../helpers/getOwner.js')
 const {isFirstPartyCookie,isCookieValueInUrl} = require('./../helpers/cookies')
+const tldts = require('tldts-experimental')
+const {TLDTS_OPTIONS} = require('../helpers/const')
 
 const COOKIE_LENGTH_CUTOFF = 5
 
@@ -30,6 +32,7 @@ class Request {
                     cookie.value.length > COOKIE_LENGTH_CUTOFF &&
                     isCookieValueInUrl(cookie, new URL(reqData.url))
             })
+        this.initiator = _getInitiator(site.domain, reqData.url, reqData.initiators)
     }
 
     /**
@@ -61,6 +64,41 @@ function _setsCookies (req) {
         return true
     }
     return false
+}
+
+/**
+ * Returns hostname of first initiator which doesn't share eTLD+1 with the request.
+ * 
+ * @param {string} siteUrl
+ * @param {string} reqUrl
+ * @param {Array<string>} initiators 
+ * @returns {string} eTLD+1 or "first party"
+ */
+function _getInitiator (siteUrl, reqUrl, initiators) {
+    const siteUrlData = tldts.parse(siteUrl, TLDTS_OPTIONS)
+    const reqUrlData = tldts.parse(reqUrl, TLDTS_OPTIONS)
+
+    // site is the default initiator
+    let finalInit = siteUrlData.isIp ? siteUrlData.host : siteUrlData.domain
+
+    if (initiators.length) {
+        for (const init of initiators) {
+            const initUrlData = tldts.parse(init, TLDTS_OPTIONS)
+
+            // first initiator in chain with a different eTLD+1 than the request
+            if (reqUrlData.isIp ? reqUrlData.host !== initUrlData.host : reqUrlData.domain !== initUrlData.domain) {
+                finalInit = initUrlData
+                break
+            }
+        }
+    }
+
+    if (finalInit && (finalInit.isIp ? finalInit.host !== siteUrlData.host : finalInit.domain !== siteUrlData.domain)) {
+        return finalInit.domain
+    }
+    
+    // if site is the initiator normalize the value
+    return 'first party'
 }
 
 module.exports = Request

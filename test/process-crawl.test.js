@@ -17,6 +17,7 @@ describe('Process Crawl', () => {
 
     let site
     const expectedDomains = [
+        "googletagmanager.com",
         "google-analytics.com",
         "tracker.com"
     ]
@@ -42,6 +43,10 @@ describe('Process Crawl', () => {
 
         it('extracts 3p domains', () => {
             assert.deepStrictEqual(Object.keys(site.uniqueDomains), expectedDomains)
+        })
+
+        it('extracts 3p domain initiators', () => {
+            assert.deepStrictEqual(site.uniqueDomains['google-analytics.com'].initiators, {"googletagmanager.com": 8})
         })
 
         it('extracts 3p entities', () => {
@@ -72,6 +77,7 @@ describe('Process Crawl', () => {
         it('extracts domain prevalence', () => {
             assert.deepStrictEqual(crawl.domainPrevalence, {
                 "google-analytics.com": 1,
+                "googletagmanager.com": 1,
                 "tracker.com": 1,
             })
         })
@@ -84,6 +90,20 @@ describe('Process Crawl', () => {
             assert.deepStrictEqual(crawl.domainCookies, {
                 'google-analytics.com': 1,
                 'tracker.com': 1,
+            })
+        })
+
+        it('extracts domain initiators', () => {
+            assert.deepStrictEqual(crawl.domainInitiators, {
+                'google-analytics.com': {
+                    'googletagmanager.com': 8
+                },
+                'googletagmanager.com': {
+                    'first party': 1
+                },
+                'tracker.com': {
+                    'first party': 1
+                },
             })
         })
 

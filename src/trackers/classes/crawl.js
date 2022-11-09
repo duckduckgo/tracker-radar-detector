@@ -33,6 +33,9 @@ class Crawl {
         // Sites that are CNAME cloaked as first party.
         this.domainCloaks = {}
 
+        // initiators for 3p domain across the whole crawl
+        this.domainInitiators = {}
+
         this.pageMap = {}
 
         // for calculating api fingerprint weights
@@ -81,6 +84,14 @@ function _processSite (crawl, site) {
 
         if (site.uniqueDomains[domain].usesCNAMECloaking) {
             crawl.domainCloaks[domain] ? crawl.domainCloaks[domain]++ : crawl.domainCloaks[domain] = 1
+        }
+
+        if (site.uniqueDomains[domain].initiators) {
+            for (const initiator of Object.keys(site.uniqueDomains[domain].initiators)) {
+                const count = site.uniqueDomains[domain].initiators[initiator]
+                crawl.domainInitiators[domain] = crawl.domainInitiators[domain] || {}
+                crawl.domainInitiators[domain][initiator] ? crawl.domainInitiators[domain][initiator] += count : crawl.domainInitiators[domain][initiator] = count
+            }
         }
     })
 
@@ -163,6 +174,29 @@ function _getDomainSummaries (crawl) {
     // How often does this domain appear cloaked?
     Object.keys(crawl.domainCloaks).forEach(domain => {
         domainSummary[domain].cloaked = crawl.domainCloaks[domain] / crawl.domainPrevalence[domain]
+    })
+
+    // top initiators
+    Object.keys(crawl.domainInitiators).forEach(domain => {
+        let requests = 0
+        let top = []
+
+        Object.keys(crawl.domainInitiators[domain]).forEach(init => {
+            requests += crawl.domainInitiators[domain][init]
+        })
+
+        // transform to [{domain: initiator.com, prevalence: 0.1}] where prevalence is calculated for all requests
+        Object.keys(crawl.domainInitiators[domain]).forEach(init => {
+            top.push({domain: init, prevalence: crawl.domainInitiators[domain][init] / requests})
+        })
+
+        // sort by prevalence, get top 10
+        top = top.sort((a, b) => b.prevalence - a.prevalence)
+        if (top.length > 10) {
+            top.length = 10
+        }
+
+        domainSummary[domain].topInitiators = top
     })
 
     return domainSummary

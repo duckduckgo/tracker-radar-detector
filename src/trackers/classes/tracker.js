@@ -23,6 +23,7 @@ class Tracker {
         this.categories = _getCategories(this.domain) || []
         this.performance = performanceHelper.getPerformance(this.domain, sharedData.config.performanceDataLoc) || {}
         this.cookies = +(_getCookies(this.domain).toPrecision(3))
+        this.topInitiators = sharedData.domains[this.domain].topInitiators
 
         const policy = _getPolicy(this.domain, this.owner)
         
