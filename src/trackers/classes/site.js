@@ -213,8 +213,8 @@ async function _processRequest (requestData, site) {
                 const cnameUrl = `http://${cname}`
                 if (!site.isFirstParty(cnameUrl)) {
                     // console.log(`Third Party CNAME: ${request.data.subdomain}.${request.data.domain} -> ${cname}`)
-                    const origSubDomain = request.data.subdomain + "." + request.data.domain
-                    site.cnameCloaks[cname] = request.data.subdomain + "." + request.data.domain
+                    const origSubDomain = request.data.hostname
+                    site.cnameCloaks[cname] = request.data.hostname
                     request.extractURLData(cnameUrl)
                     request.wasCNAME = true
                     request.originalSubdomain = origSubDomain

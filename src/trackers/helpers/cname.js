@@ -61,7 +61,7 @@ class CNAME {
     static createCnameRecord(request) {
         return {
             "original": request.originalSubdomain,
-            "resolved": request.data.subdomain + "." + request.data.domain
+            "resolved": request.data.hostname
         }
     }
 
