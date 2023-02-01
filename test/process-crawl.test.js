@@ -30,7 +30,7 @@ describe('Process Crawl', () => {
             await site.processRequest(request)
             crawl.stats.requests++
         }
-        crawl.processSite(site)
+        await crawl.processSite(site)
         Object.values(crawl.commonRequests).forEach(req => req.finalize(2))
     })
 
