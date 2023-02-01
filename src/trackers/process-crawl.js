@@ -31,7 +31,7 @@ async function processSite(siteData) {
     }
 
     // update crawl level domain prevalence, entity prevalence, and fingerprinting
-    crawl.processSite(site)
+    await crawl.processSite(site)
     crawl.stats.sites++
     bar.tick()
 }
@@ -55,6 +55,7 @@ async function processCrawl() {
             sitesQueue.push(processSite(siteData))
         }
         await Promise.allSettled(sitesQueue)
+        crawl.exportEntities()
         crawl.finalizeRequests()
         crawl.writeSummaries()
         console.log(`${chalk.blue(crawl.stats.sites)} sites processed\n${chalk.blue(crawl.stats.requests)} requests processed\n${chalk.blue(crawl.stats.requestsSkipped)} requests skipped`)
