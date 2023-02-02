@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 const fs = require('fs')
 const path = require('path')
 const {median, std} = require('mathjs')
@@ -27,6 +28,9 @@ class Crawl {
         // overall entity prevalence split into tracking and non-tracking
         this.entityPrevalence = {}
 
+        // updated entity data that will be exported after the analysis
+        this.entityData = {}
+
         // summary of 3p requests seen in the crawl
         this.commonRequests = {}
 
@@ -45,12 +49,19 @@ class Crawl {
         }
     }
 
+    exportEntities() {
+        for (const [entityName, data] of Object.entries(this.entityData)) {
+            const entityFile = path.join(shared.config.trackerDataLoc, 'entities', `${entityName}.json`)
+            fs.writeFileSync(entityFile, JSON.stringify(data, null, 4))
+        }
+    }
+
     writeSummaries () {
         _writeSummaries(this)
     }
 
-    processSite (site) {
-        _processSite(this, site)
+    async processSite (site) {
+        await _processSite(this, site)
     }
 
     finalizeRequests () {
@@ -67,7 +78,32 @@ class Crawl {
     }
 }
 
-function _processSite (crawl, site) {
+/**
+ * Add domain to entity property list when nameserver match is found. 
+ * @param {Crawl} crawl - reference to the current crawl
+ * @param {string} entityName - entity file name to update
+ * @param {string} domain - domain name to add to the entity properties list
+ */
+function _updateEntityProperties (crawl, entityName, domain) {
+    if (!(entityName in crawl.entityData)) {
+        const entityFile = path.join(shared.config.trackerDataLoc, 'entities', `${entityName}.json`)
+
+        try {
+            const data = fs.readFileSync(entityFile, 'utf8')
+            const entityData = JSON.parse(data)
+            crawl.entityData[entityName] = entityData
+        } catch (e) {
+            console.error(`Could not update entity data: ${e} ${e.stack}`)
+            return
+        }
+    }
+    const entityData = crawl.entityData[entityName]
+    if (!entityData.properties.includes(domain)) {
+        entityData.properties.push(domain)
+    }
+}
+
+async function _processSite (crawl, site) {
     // go through the uniqueDomains found on the site and update the crawl domain prevalence, fingerprinting, and cookies
     Object.keys(site.uniqueDomains).forEach(domain => {
         crawl.domainPrevalence[domain] ? crawl.domainPrevalence[domain] += 1 : crawl.domainPrevalence[domain] = 1
@@ -102,10 +138,35 @@ function _processSite (crawl, site) {
     }
 
     // add common requests entries for each of the requests found on the site
-    site.requests.forEach(request => {
+    for (const request of site.requests) {
         if (!request.domain) {
             crawl.stats.requestsSkipped++
-            return
+            continue
+        }
+
+        if (!site.isFirstParty(request.url)) {
+            const nameservers = await shared.nameservers.resolveNs(request.domain)
+    
+            if (nameservers && nameservers.length) {
+                request.nameservers = nameservers
+    
+                // The option to group by nameservers is set in the config
+                // All nameservers must match so we can do a quick check to see that the first nameserver exists in our data
+                if (shared.nameserverList && shared.nameserverToEntity[request.nameservers[0]]) {
+                    for (const nsEntry of shared.nameserverList) {
+                        const entityNS = new Set(nsEntry.nameservers)
+
+                        // all nameservers in set must match
+                        const nsDiff = request.nameservers.filter(x => !entityNS.has(x))
+
+                        if (nsDiff && nsDiff.length === 0) {
+                            _updateEntityProperties(crawl, nsEntry.name, request.domain)
+                            request.owner = nsEntry.name
+                            break
+                        }
+                    }
+                }
+            }
         }
 
         const key = _getCommonRequestKey(request)
@@ -115,7 +176,7 @@ function _processSite (crawl, site) {
         } else {
             crawl.commonRequests[key].update(request, site)
         }
-    })
+    }
 
     for (const apis of Object.values(site.siteData.data.apis.callStats)) {
         const apisUsed = Object.keys(apis)
