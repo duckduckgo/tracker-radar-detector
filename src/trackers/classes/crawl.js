@@ -65,6 +65,7 @@ class Crawl {
     }
 
     finalizeRequests () {
+        const relativeRanks = []
         for (const [key, request] of Object.entries(this.commonRequests)) {
             if (request.sites < shared.config.minSites) {
                 delete this.commonRequests[key]
@@ -74,7 +75,14 @@ class Crawl {
             this.pageMap[request.rule] = [...request.pages]
 
             request.finalize(this.stats.sites)
+
+            relativeRanks.push([key, request.weightedRank])
         }
+
+        relativeRanks.sort((a,b) => b[1] - a[1]).forEach((e, idx) => {
+            this.commonRequests[e[0]].relativeRank = idx+1
+        })
+
     }
 }
 

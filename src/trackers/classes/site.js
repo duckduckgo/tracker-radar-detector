@@ -5,6 +5,7 @@ const URL = require('./../helpers/url.js')
 const cnameHelper = require('./../helpers/cname.js')
 const getOwner = require('./../helpers/getOwner.js')
 const {TLDTS_OPTIONS} = require('../helpers/const')
+const {getSiteRank} = require('./../helpers/getSiteRank.js')
 
 const {calculateCookieTtl,isSavedCookieSetterCall,parseCookie} = require('../helpers/cookies')
 
@@ -51,6 +52,8 @@ class Site {
                 obj[`${source}-${cookie.name}`] = cookie
                 return obj
             }, {}))
+
+        this.rank = getSiteRank(url)
     }
 
     async processRequest (requestData) {

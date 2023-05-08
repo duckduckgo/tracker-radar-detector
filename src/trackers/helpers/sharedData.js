@@ -38,7 +38,28 @@ class SharedData {
                 }, {})
             }
         }
+
+        if (this.config.siteRankListLoc) {
+            const siteRanks = fs.readFileSync(this.config.siteRankListLoc, 'utf-8').split('\n')
+            this.siteRanks = _formatSiteRanks(siteRanks)
+        }
     }
+}
+
+function _formatSiteRanks (siteRanks) {
+    return siteRanks.reduce((list, e) => {
+        const site = e.startsWith('http') ? e : `http://${e}`
+        let url
+        try {
+            url = new URL(site)
+        } catch {
+            return list
+        }
+        if (!list.includes(url.domain)) {
+            list.push(url.domain)
+        }
+        return list
+    }, [])           
 }
 
 // map entity domains to name for easy lookup

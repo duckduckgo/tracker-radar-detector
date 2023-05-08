@@ -18,6 +18,7 @@ To generate a Tracker Radar data set follow these steps:
 |crawlerDataLoc|path to your crawler data directory|
 |performanceDataLoc|path to your performance crawler data|
 |nameserverListLoc|path to your nameserver to entity file|
+|siteRankListLoc|path to your list of ranked domains for calculating weightedRank and relativeRank
 
 ## Generating Tracker Radar data
 

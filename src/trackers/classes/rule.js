@@ -17,6 +17,8 @@ class Rule {
         this.nameservers = newRuleData.nameservers
         this.firstPartyCookies = newRuleData.firstPartyCookies
         this.firstPartyCookiesSent = newRuleData.firstPartyCookiesSent
+        this.relativeRank = newRuleData.relativeRank
+        this.weightedRank = newRuleData.weightedRank
 
         if (sharedData.config.includeExampleSites) {
             this.exampleSites = newRuleData.exampleSites

@@ -1,5 +1,6 @@
 const cname = require('./../helpers/cname.js')
 const {getExampleSites} = require('./../helpers/getExampleSites.js')
+const {getWeightedRank} = require('./../helpers/getSiteRank.js')
 const sharedData = require('./../helpers/sharedData.js')
 
 class CommonRequest {
@@ -31,6 +32,8 @@ class CommonRequest {
         this._processFirstPartyCookiesForRequest(request)
 
         this.nameservers = request.nameservers
+
+        this.siteRanks = [site.rank] || []
     }
 
     update (request, site) {
@@ -82,6 +85,10 @@ function _update (commonReq, newReq, site) {
         commonReq.sites++
         commonReq.apis = _combineApis(commonReq.apis, newReq.apis)
 
+        if (site.rank) {
+            commonReq.siteRanks.push(site.rank)
+        }
+
         if (newReq.data.subdomain) {
             commonReq.subdomains.add(newReq.data.subdomain)
         }
@@ -128,6 +135,8 @@ function _finalize (request, totalSites, cookieSentThreshold = 0.01) {
     // calculate the average and standard deviation in fingerprint scores across all sites this request was found on
     const avg = request.fpPerSite.reduce((sum, val) => sum + val, 0) / request.fpPerSite.length
     const sumSquare = request.fpPerSite.reduce((sum, val) => sum + Math.pow(Math.abs(val - avg), 2), 0)
+
+    request.weightedRank = getWeightedRank(request)
 
     request.fpAvg = avg
     request.fpStd = Math.sqrt(sumSquare / (request.fpPerSite.length - 1)) || 0
