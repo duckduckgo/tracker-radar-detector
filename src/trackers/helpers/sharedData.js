@@ -40,12 +40,14 @@ class SharedData {
         }
 
         if (this.config.siteRankListLoc) {
+            // read in flat file of site ranks. Assumed to be in order from most to least popular
             const siteRanks = fs.readFileSync(this.config.siteRankListLoc, 'utf-8').split('\n')
             this.siteRanks = _formatSiteRanks(siteRanks)
         }
     }
 }
 
+// Get list of site ranks. We ignore hostname and just use domain for ranking.
 function _formatSiteRanks (siteRanks) {
     return siteRanks.reduce((list, e) => {
         const site = e.startsWith('http') ? e : `http://${e}`

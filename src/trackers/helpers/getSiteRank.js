@@ -7,19 +7,13 @@ function getSiteRank (domain) {
         return
     }
 
-    // look for hostname rank or domain, but hostname is prefered
-    let rank = sharedData.siteRanks.indexOf(domain.hostname)
+    let rank = sharedData.siteRanks.indexOf(domain)
 
     if (rank === -1) {
-        const domainRank = sharedData.siteRanks.indexOf(domain.hostname)
-        if (domainRank === -1) {
-            return 0
-        } else {
-            rank = domainRank
-        }
+        return 1
     }
 
-    return sharedData.siteRanks.length - (1- rank)
+    return sharedData.siteRanks.length - rank
 }
 
 // get common request weighted rank based off the rakings of 
