@@ -2,12 +2,12 @@ const sharedData = require('./sharedData.js')
 
 // get site ranking relative to siteRanks list. Most popular site
 // gets rank equal to lenght of the list, second most popular length-1 etc
-function getSiteRank (domain) {
-    if (!(domain && sharedData.siteRanks)) {
+function getSiteRank (parsedUrl) {
+    if (!(parsedUrl && sharedData.siteRanks)) {
         return
     }
 
-    let rank = sharedData.siteRanks.indexOf(domain)
+    let rank = sharedData.siteRanks.indexOf(parsedUrl.domain)
 
     if (rank === -1) {
         return 1
