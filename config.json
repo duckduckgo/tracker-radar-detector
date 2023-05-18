@@ -18,5 +18,6 @@
     "includePages": true,
     "pageMapLoc": "path to store page maps",
     "topExampleSites": "JSON list of top sites to include as example sites",
-    "includeExampleSites": "number of example sites to include for each resource"
+    "includeExampleSites": "number of example sites to include for each resource",
+    "overrideFingerprintWeights": true
 }

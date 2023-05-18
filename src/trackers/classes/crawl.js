@@ -321,7 +321,9 @@ function _writeSummaries (crawl) {
     csv = csv.sort((a, b) => b[1] - a[1])
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/entity_prevalence.csv`, csv.reduce((str, row) => {str += `"${row[0]}",${row[1]},${row[2]},${row[3]}\n`; return str}, 'Entity,Total Prevalence,Tracking Prevalence,Non-tracking Prevalence\n'))
 
-    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/api_fingerprint_weights.json`, JSON.stringify(getFingerprintWeights(crawl), null, 4))
+    if (shared.config.overrideFingerprintWeights) {
+        fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/api_fingerprint_weights.json`, JSON.stringify(getFingerprintWeights(crawl), null, 4))
+    }
 }
 
 function updateEntityPrevalence (crawl) {
