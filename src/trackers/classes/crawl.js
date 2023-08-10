@@ -47,6 +47,9 @@ class Crawl {
             scripts: {tracking: 0, nontracking: 0},
             apis: {}
         }
+
+        // Per-site data
+        this.dataBySite = {}
     }
 
     exportEntities() {
@@ -178,6 +181,25 @@ async function _processSite (crawl, site) {
         }
     }
 
+    // analyse per-site script fingerprinting
+    for (const [script, apis] of Object.entries(site.siteData.data.apis.callStats)) {
+        const scriptMatch = shared.config.analyseScripts.find(r => script.match(r))
+        if (scriptMatch === undefined) {
+            continue
+        }
+        if (!crawl.dataBySite[site.domain]) {
+            crawl.dataBySite[site.domain] = {}
+        }
+        if (!crawl.dataBySite[site.domain][site.host]) {
+            crawl.dataBySite[site.domain][site.host] = {fingerprinting: {}}
+        }
+        const fp = crawl.dataBySite[site.domain][site.host].fingerprinting
+        if (!fp[scriptMatch]) {
+            fp[scriptMatch] = {apis: []}
+        }
+        fp[scriptMatch].apis = [...new Set([...fp[scriptMatch].apis, ...Object.keys(apis)])].sort()
+    }
+
     for (const apis of Object.values(site.siteData.data.apis.callStats)) {
         const apisUsed = Object.keys(apis)
         
@@ -263,6 +285,10 @@ function _getDomainSummaries (crawl) {
     return domainSummary
 }
 
+function _getDataBySite (crawl) {
+    return crawl.dataBySite
+}
+
 function _getEntitySummaries (crawl) {
     delete crawl.entityPrevalence.undefined
 
@@ -281,6 +307,7 @@ function _getEntitySummaries (crawl) {
 
 function _writeSummaries (crawl) {
     fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/domain_summary.json`, JSON.stringify(_getDomainSummaries(crawl), null, 4))
+    fs.writeFileSync(`${shared.config.trackerDataLoc}/build-data/generated/data_by_site.json`, JSON.stringify(_getDataBySite(crawl), null, 4))
 
     fs.writeFileSync(`${shared.config.trackerDataLoc}/crawlStats.json`, JSON.stringify(crawl.stats, null, 4))
 

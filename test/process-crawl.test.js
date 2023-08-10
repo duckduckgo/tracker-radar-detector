@@ -25,6 +25,9 @@ describe('Process Crawl', () => {
     before(async () => {
         // Mock owner of 3rd party domains
         sharedData.entityMap.set('google-analytics.com', 'Google LLC')
+        sharedData.analyseScripts = [
+            'google-analytics\\.com/analytics\\.js',
+        ]
         site = new Site(mockSiteData)
         for (const request of mockSiteData.data.requests) {
             await site.processRequest(request)
@@ -138,6 +141,31 @@ describe('Process Crawl', () => {
                 firstPartyCookiesSent: {
                     "_ga": 0.5,
                 }
+            })
+        })
+
+        it('extracts data by site', () => {
+            assertObjectPartial(crawl.dataBySite, {
+                "example.com": {
+                    "test.example.com": {
+                        "fingerprinting": {
+                            "google-analytics\\.com/analytics\\.js": {
+                                "apis": [
+                                    "Date.prototype.getTime",
+                                    "Document.cookie getter",
+                                    "Document.cookie setter",
+                                    "Navigator.prototype.javaEnabled",
+                                    "Navigator.prototype.language",
+                                    "Navigator.prototype.plugins",
+                                    "Navigator.prototype.userAgent",
+                                    "Screen.prototype.colorDepth",
+                                    "Screen.prototype.height",
+                                    "Screen.prototype.width",
+                                ],
+                            },
+                        },
+                    },
+                },
             })
         })
 
