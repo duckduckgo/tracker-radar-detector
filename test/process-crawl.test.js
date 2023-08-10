@@ -25,7 +25,7 @@ describe('Process Crawl', () => {
     before(async () => {
         // Mock owner of 3rd party domains
         sharedData.entityMap.set('google-analytics.com', 'Google LLC')
-        sharedData.analyseScripts = [
+        sharedData.config.analyseScripts = [
             'google-analytics\\.com/analytics\\.js',
         ]
         site = new Site(mockSiteData)
