@@ -17,7 +17,9 @@
     "cname_ignore_subdomains": ["", "www"],
     "includePages": true,
     "pageMapLoc": "path to store page maps",
-    "analyseScripts": [],
+    "analyseScripts": [
+        "list of regular expressions to select scripts for per-site fingerprinting analysis..."
+    ],
     "topExampleSites": "JSON list of top sites to include as example sites",
     "includeExampleSites": "number of example sites to include for each resource",
     "overrideFingerprintWeights": true
