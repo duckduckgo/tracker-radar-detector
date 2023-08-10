@@ -182,8 +182,9 @@ async function _processSite (crawl, site) {
     }
 
     // analyse per-site script fingerprinting
+    const analyseScripts = shared.config.analyseScripts || []
     for (const [script, apis] of Object.entries(site.siteData.data.apis.callStats)) {
-        const scriptMatch = shared.config.analyseScripts.find(r => script.match(r))
+        const scriptMatch = analyseScripts.find(r => script.match(r))
         if (scriptMatch === undefined) {
             continue
         }
