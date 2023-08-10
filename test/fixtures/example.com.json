@@ -18,6 +18,9 @@
           "Date.prototype.getTime": 14,
           "Navigator.prototype.userAgent": 2,
           "Document.cookie setter": 1
+        },
+        "http://www.google-analytics.com/analytics.js": {
+          "Document.cookie getter": 1
         }
       },
       "savedCalls": [
