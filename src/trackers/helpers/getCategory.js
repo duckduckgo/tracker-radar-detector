@@ -4,9 +4,7 @@ const parse = require('csv-parse/lib/sync')
 
 function getCategories (categoryCSVfilePath) {
     const categoryCSV = fs.readFileSync(categoryCSVfilePath, 'utf8').split('\n')
-    const categoryHeader = categoryCSV.shift()
-        .replace(/\r/gi, "")
-        .split(',').slice(1)
+    const categoryHeader = parse(categoryCSV.shift())[0].slice(1)
 
     const domainToCategory = categoryCSV.reduce((obj, row) => {
         
