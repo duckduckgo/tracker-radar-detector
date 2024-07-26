@@ -27,9 +27,9 @@ class ParsedURL extends URL {
                 // a.example.com and b.a.example.com for a request from 123.b.a.example.com
                 // check that suffix is preceded by a dot or is at the beginning of the hostname
                 const suffixMatches = pslExtras.privatePSL.filter(suffix => {
-                    const escapedSuffix = suffix.replace('.', '\\.');
-                    const regex = new RegExp(`(^|\\.)${escapedSuffix}$`);
-                    return regex.test(this._domainInfo.hostname);
+                    const escapedSuffix = suffix.replace('.', '\\.')
+                    const regex = new RegExp(`(^|\\.)${escapedSuffix}$`)
+                    return regex.test(this._domainInfo.hostname)
                 });
 
                 // reformat domainInfo to make this request look like a private domain
@@ -41,11 +41,11 @@ class ParsedURL extends URL {
                     })
 
                     // Array of subdomain after removing suffix from hostname
-                    const splitSubdomain = this._domainInfo.hostname.replace(new RegExp(`\\.?${suffix}$`), '').split('.');
+                    const splitSubdomain = this._domainInfo.hostname.replace(new RegExp(`\\.?${suffix}$`), '').split('.')
                     const domainWithoutSuffix = splitSubdomain.pop()
 
                     this._domainInfo.publicSuffix = suffix
-                    this._domainInfo.domain = domainWithoutSuffix ? `${domainWithoutSuffix}.${suffix}` : suffix;
+                    this._domainInfo.domain = domainWithoutSuffix ? `${domainWithoutSuffix}.${suffix}` : suffix
                     this._domainInfo.domainWithoutSuffix = domainWithoutSuffix
                     this._domainInfo.subdomain = splitSubdomain.join('.')
                     this._domainInfo.isPrivate = true
