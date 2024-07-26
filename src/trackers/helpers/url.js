@@ -30,7 +30,7 @@ class ParsedURL extends URL {
                     const escapedSuffix = suffix.replace('.', '\\.')
                     const regex = new RegExp(`(^|\\.)${escapedSuffix}$`)
                     return regex.test(this._domainInfo.hostname)
-                });
+                })
 
                 // reformat domainInfo to make this request look like a private domain
                 if (suffixMatches && suffixMatches.length) {
