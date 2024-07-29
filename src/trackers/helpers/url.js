@@ -15,7 +15,7 @@ class ParsedURL extends URL {
     }
 
     get domainInfo() {
-        // extend domainInfo to use PSL 
+        // extend domainInfo to use PSL
         if (!this._domainInfo) {
             this._domainInfo = parse(this.hostname, {
                 extractHostname: false,
@@ -25,7 +25,12 @@ class ParsedURL extends URL {
             if (!this._domainInfo.isPrivate && pslExtras && pslExtras.privatePSL) {
                 // get list of possible suffix matches, we can have multiple matches for a single request
                 // a.example.com and b.a.example.com for a request from 123.b.a.example.com
-                const suffixMatches = pslExtras.privatePSL.filter(suffix => this._domainInfo.hostname.match(suffix))
+                // check that suffix is preceded by a dot or is at the beginning of the hostname
+                const suffixMatches = pslExtras.privatePSL.filter(suffix => {
+                    const escapedSuffix = suffix.replace('.', '\\.')
+                    const regex = new RegExp(`(^|\\.)${escapedSuffix}$`)
+                    return regex.test(this._domainInfo.hostname)
+                })
 
                 // reformat domainInfo to make this request look like a private domain
                 if (suffixMatches && suffixMatches.length) {
@@ -34,13 +39,13 @@ class ParsedURL extends URL {
                     const suffix = suffixMatches.reduce((l,s) => {
                         return l.length >= s.length ? l : s
                     })
-                    
+
                     // Array of subdomain after removing suffix from hostname
-                    const splitSubdomain = this._domainInfo.hostname.replace(suffix, '').replace(/\.$/,'').split('.')
+                    const splitSubdomain = this._domainInfo.hostname.replace(new RegExp(`\\.?${suffix}$`), '').split('.')
                     const domainWithoutSuffix = splitSubdomain.pop()
 
                     this._domainInfo.publicSuffix = suffix
-                    this._domainInfo.domain = `${domainWithoutSuffix}.${suffix}`
+                    this._domainInfo.domain = domainWithoutSuffix ? `${domainWithoutSuffix}.${suffix}` : suffix
                     this._domainInfo.domainWithoutSuffix = domainWithoutSuffix
                     this._domainInfo.subdomain = splitSubdomain.join('.')
                     this._domainInfo.isPrivate = true
