@@ -1,5 +1,6 @@
 const assert = require('assert');
 const URL = require('../src/trackers/helpers/url.js');
+const sharedData = require('../src/trackers/helpers/sharedData')
 
 const testCases = [
     {
@@ -128,12 +129,16 @@ describe('PSL domain parsing', () => {
     describe('parse domain with custom PSL', () => {
         testCases.forEach(({ input, expectedOutput }) => {
             it(`should correctly parse ${input}`, () => {
-                const result = new URL('https://' + input).domainInfo
-                assert.strictEqual(result.publicSuffix, expectedOutput.publicSuffix)
-                assert.strictEqual(result.domain, expectedOutput.domain)
-                assert.strictEqual(result.domainWithoutSuffix, expectedOutput.domainWithoutSuffix)
-                assert.strictEqual(result.subdomain, expectedOutput.subdomain)
-                assert.strictEqual(result.isPrivate, expectedOutput.isPrivate)
+                if (!sharedData.config.pslExtras) {
+                    it.skip('No custom PSL data provided')
+                } else {
+                    const result = new URL('https://' + input).domainInfo
+                    assert.strictEqual(result.publicSuffix, expectedOutput.publicSuffix)
+                    assert.strictEqual(result.domain, expectedOutput.domain)
+                    assert.strictEqual(result.domainWithoutSuffix, expectedOutput.domainWithoutSuffix)
+                    assert.strictEqual(result.subdomain, expectedOutput.subdomain)
+                    assert.strictEqual(result.isPrivate, expectedOutput.isPrivate)
+                }
             });
         });
     });
