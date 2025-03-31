@@ -195,8 +195,10 @@ const exportEntities = updatedEntityMap => {
         } else {
             const fileDomains = jsonContent.properties
             const mapDomains = existingEntity.properties
-            if (!(fileDomains.length === mapDomains.length && fileDomains.every((value, index) => value === mapDomains[index]))) {
-                console.log("entity domains have been updated, updating file", entityName)
+            if (!(jsonContent.displayName === existingEntity.displayName &&
+                fileDomains.length === mapDomains.length &&
+                fileDomains.every((value, index) => value === mapDomains[index]))) {
+                console.log("entity has changed, updating file", entityName)
                 jsonContent.properties = mapDomains
                 jsonContent.displayName = existingEntity.displayName
                 fs.writeFileSync(`${entityDir}/${file}`, JSON.stringify(jsonContent, null, 4))
