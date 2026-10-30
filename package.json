@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "Code used to build a Tracker Radar data set from raw crawl data.",
   "engines": {
-    "node": ">=12.9"
+    "node": ">=24.14.1"
   },
   "dependencies": {
     "@cliqz/url-parser": "^1.1.4",
